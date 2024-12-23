@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>AI English Practice</title>
+    <link href="popup.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div id="setup-view" class="view">
+            <h2>Setup</h2>
+            <div class="form-group">
+                <label for="gemini-key">Gemini API Key</label>
+                <input type="password" id="gemini-key" required>
+                <div class="hint">Required for AI feedback</div>
+            </div>
+            <div class="form-group">
+                <label for="elevenlabs-key">ElevenLabs API Key</label>
+                <input type="password" id="elevenlabs-key">
+                <div class="hint">Optional for voice response</div>
+            </div>
+            <button id="save-setup" class="btn primary">Save & Continue</button>
+        </div>
+
+        <div id="practice-view" class="view hidden">
+            <div class="header">
+                <h1>English Practice</h1>
+                <button id="settings" class="btn icon">⚙️</button>
+            </div>
+            
+            <div class="practice-container">
+                <div class="recording-section">
+                    <div id="status-indicator" class="status">Ready to start</div>
+                    <canvas id="visualizer"></canvas>
+                    <div class="controls">
+                        <button id="start-recording" class="btn primary">Start Speaking</button>
+                        <button id="stop-recording" class="btn secondary" disabled>Stop</button>
+                    </div>
+                </div>
+
+                <div class="feedback-section">
+                    <div id="loading" class="loading hidden">
+                        <div class="spinner"></div>
+                        <span>Processing your speech...</span>
+                    </div>
+                    <div id="feedback" class="feedback hidden">
+                        <div class="recognition">
+                            <h3>Recognition</h3>
+                            <p id="recognized-text"></p>
+                        </div>
+                        <div class="corrections">
+                            <h3>Feedback</h3>
+                            <div id="ai-feedback"></div>
+                        </div>
+                        <div class="next-prompt">
+                            <h3>Try Next</h3>
+                            <p id="next-suggestion"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="popup.js"></script>
+</body>
+</html>
