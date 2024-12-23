@@ -52,14 +52,68 @@ class PopupManager {
             this.showPracticeView();
         });
 
-        document.getElementById('start-recording').addEventListener('click', () => this.startRecording());
-        document.getElementById('stop-recording').addEventListener('click', () => this.stopRecording());
-        document.getElementById('settings').addEventListener('click', () => this.showSetupView());
+        document.getElementById('start-recording').addEventListener('click', () => 
+            this.startRecording()
+        );
+        document.getElementById('stop-recording').addEventListener('click', () => 
+            this.stopRecording()
+        );
+        document.getElementById('settings').addEventListener('click', () => 
+            this.showSetupView()
+        );
+        document.getElementById('request-mic').addEventListener('click', () => {
+            this.requestMicrophonePermission();
+        });
+    }
+
+    async checkAndRequestMicrophone() {
+        try {
+            await chrome.permissions.request({
+                permissions: ['microphone']
+            });
+            return await this.audioService.initialize();
+        } catch (error) {
+            console.error('Permission request failed:', error);
+            return false;
+        }
+    }
+
+    async startRecording() {
+        const hasAccess = await this.checkAndRequestMicrophone();
+        if (!hasAccess) return;
+        
+        const success = await this.audioService.initialize();
+        if (!success) {
+            alert('Failed to access microphone');
+            return;
+        }
+
+        this.recognition.start();
+        await this.audioService.start();
+        
+        if (!this.visualizer) {
+            this.visualizer = new AudioVisualizer(document.getElementById('visualizer'));
+            this.visualizer.initialize(this.audioService.audioContext, this.audioService.source);
+        }
+
+        document.getElementById('start-recording').disabled = true;
+        document.getElementById('stop-recording').disabled = false;
+    }
+
+    async requestMicrophonePermission() {
+        try {
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+            document.getElementById('request-mic').style.display = 'none';
+            return true;
+        } catch (error) {
+            console.error('Mic permission error:', error);
+            return false;
+        }
     }
 
     async stopRecording() {
         const text = await this.recognition.stop();
-        const audioBlob = await this.audioService.stopRecording();
+        const audioBlob = await this.audioService.stop();
         
         document.getElementById('start-recording').disabled = false;
         document.getElementById('stop-recording').disabled = true;

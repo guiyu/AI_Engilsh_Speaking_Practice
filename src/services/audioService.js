@@ -6,12 +6,47 @@ export class AudioService {
         this.audioChunks = [];
     }
 
+    async start() {
+        if (!this.stream) return false;
+        this.mediaRecorder = new MediaRecorder(this.stream);
+        this.audioChunks = [];
+        
+        this.mediaRecorder.ondataavailable = (event) => {
+            this.audioChunks.push(event.data);
+        };
+        
+        this.mediaRecorder.start();
+        return true;
+    }
+
+    async stop() {
+        return new Promise((resolve) => {
+            this.mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+                resolve(audioBlob);
+            };
+            this.mediaRecorder.stop();
+        });
+    }
+
     async initialize() {
         try {
-            this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    sampleRate: 44100
+                }
+            });
+            this.stream = stream;
+            this.audioContext = new AudioContext();
+            this.source = this.audioContext.createMediaStreamSource(stream);
             return true;
         } catch (error) {
             console.error('Audio initialization failed:', error);
+            if (error.name === 'NotAllowedError') {
+                alert('Please allow microphone access in your browser settings');
+            }
             return false;
         }
     }
