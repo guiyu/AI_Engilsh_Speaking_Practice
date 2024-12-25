@@ -9,7 +9,6 @@
       "activeTab",
       "scripting"
     ],
-    "optional_permissions": ["microphone"],
     "host_permissions": [
       "*://*/*"
     ],

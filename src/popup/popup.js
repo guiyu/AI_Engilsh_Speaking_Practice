@@ -13,6 +13,7 @@ class PopupManager {
         this.elevenlabsService = null;
         this.recognition = new SpeechRecognition();
         
+        this.permissionView = document.getElementById('permission-view');
         this.setupView = document.getElementById('setup-view');
         this.practiceView = document.getElementById('practice-view');
         
@@ -20,13 +21,54 @@ class PopupManager {
     }
 
     async initializeUI() {
+        try {
+            // 检查麦克风权限
+            const permissionResult = await navigator.permissions.query({ name: 'microphone' });
+            
+            if (permissionResult.state === 'granted') {
+                // 已有权限，检查API设置
+                await this.checkApiSetup();
+            } else {
+                // 显示权限请求界面
+                this.showPermissionView();
+            }
+        } catch (error) {
+            console.error('Permission check failed:', error);
+            this.showPermissionView();
+        }
+    }
+
+
+    async checkApiSetup() {
         const keys = await StorageManager.getKeys();
         if (keys.geminiKey) {
             this.setupServices(keys);
             this.showPracticeView();
         } else {
-            this.setupView.classList.remove('hidden');
-            this.setupEventListeners();
+            this.showSetupView();
+        }
+    }
+
+    showPermissionView() {
+        this.permissionView.classList.remove('hidden');
+        this.setupView.classList.add('hidden');
+        this.practiceView.classList.add('hidden');
+        
+        document.getElementById('request-permission').addEventListener('click', 
+            () => this.requestMicrophonePermission());
+    }
+
+    async requestMicrophonePermission() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // 立即停止stream，我们只是要请求权限
+            stream.getTracks().forEach(track => track.stop());
+            
+            // 权限获取成功，继续设置流程
+            await this.checkApiSetup();
+        } catch (error) {
+            console.error('Mic permission error:', error);
+            alert('Please allow microphone access in your browser settings and try again.');
         }
     }
 
@@ -69,7 +111,7 @@ class PopupManager {
     async checkAndRequestMicrophone() {
         try {
             await chrome.permissions.request({
-                permissions: ['microphone']
+                permissions: ['microphone   ']
             });
             return await this.audioService.initialize();
         } catch (error) {
@@ -79,25 +121,24 @@ class PopupManager {
     }
 
     async startRecording() {
-        const hasAccess = await this.checkAndRequestMicrophone();
-        if (!hasAccess) return;
-        
-        const success = await this.audioService.initialize();
-        if (!success) {
-            alert('Failed to access microphone');
-            return;
-        }
+        try {
+            const success = await this.audioService.initialize();
+            if (!success) return;
 
-        this.recognition.start();
-        await this.audioService.start();
-        
-        if (!this.visualizer) {
-            this.visualizer = new AudioVisualizer(document.getElementById('visualizer'));
-            this.visualizer.initialize(this.audioService.audioContext, this.audioService.source);
-        }
+            this.recognition.start();
+            await this.audioService.startRecording();
+            
+            if (!this.visualizer) {
+                this.visualizer = new AudioVisualizer(document.getElementById('visualizer'));
+                this.visualizer.initialize(this.audioService.audioContext, this.audioService.source);
+            }
 
-        document.getElementById('start-recording').disabled = true;
-        document.getElementById('stop-recording').disabled = false;
+            document.getElementById('start-recording').disabled = true;
+            document.getElementById('stop-recording').disabled = false;
+        } catch (error) {
+            console.error('Failed to start recording:', error);
+            alert('Could not start recording. Please check your microphone permissions.');
+        }
     }
 
     async requestMicrophonePermission() {

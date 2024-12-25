@@ -156,3 +156,22 @@ input {
 #ai-feedback {
     line-height: 1.5;
 }
+
+.permission-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.permission-content p {
+    margin-bottom: 20px;
+    color: var(--text-secondary);
+}
+
+#request-permission {
+    font-size: 1.1em;
+    padding: 12px 24px;
+}
+
+.hidden {
+    display: none !important;
+}

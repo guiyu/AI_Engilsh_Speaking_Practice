@@ -7,8 +7,20 @@
 </head>
 <body>
     <div class="container">
-        <div id="setup-view" class="view">
-            <h2>Setup</h2>
+        <!-- 麦克风权限请求视图 -->
+        <div id="permission-view" class="view">
+            <h2>Setup Microphone</h2>
+            <div class="permission-content">
+                <p>This app needs microphone access to record your speech.</p>
+                <button id="request-permission" class="btn primary">
+                    Allow Microphone Access
+                </button>
+            </div>
+        </div>
+
+        <!-- API设置视图 -->
+        <div id="setup-view" class="view hidden">
+            <h2>API Setup</h2>
             <div class="form-group">
                 <label for="gemini-key">Gemini API Key</label>
                 <input type="password" id="gemini-key" required>
@@ -22,44 +34,9 @@
             <button id="save-setup" class="btn primary">Save & Continue</button>
         </div>
 
+        <!-- 主练习视图 -->
         <div id="practice-view" class="view hidden">
-            <div class="header">
-                <h1>English Practice</h1>
-                <button id="settings" class="btn icon">⚙️</button>
-            </div>
-            
-            <div class="practice-container">
-                <div class="recording-section">
-                    <div id="status-indicator" class="status">Ready to start</div>
-                    <canvas id="visualizer"></canvas>
-                    <div class="controls">
-                        <button id="start-recording" class="btn primary">Start Speaking</button>
-                        <button id="stop-recording" class="btn secondary" disabled>Stop</button>
-                        <button id="request-mic" class="btn primary">Allow Microphone</button>
-                    </div>
-                </div>
-
-                <div class="feedback-section">
-                    <div id="loading" class="loading hidden">
-                        <div class="spinner"></div>
-                        <span>Processing your speech...</span>
-                    </div>
-                    <div id="feedback" class="feedback hidden">
-                        <div class="recognition">
-                            <h3>Recognition</h3>
-                            <p id="recognized-text"></p>
-                        </div>
-                        <div class="corrections">
-                            <h3>Feedback</h3>
-                            <div id="ai-feedback"></div>
-                        </div>
-                        <div class="next-prompt">
-                            <h3>Try Next</h3>
-                            <p id="next-suggestion"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- 原有的practice内容 -->
         </div>
     </div>
     <script type="module" src="popup.js"></script>

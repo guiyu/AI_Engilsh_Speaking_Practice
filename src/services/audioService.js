@@ -4,6 +4,8 @@ export class AudioService {
         this.stream = null;
         this.mediaRecorder = null;
         this.audioChunks = [];
+        this.audioContext = null;
+        this.source = null;
     }
 
     async start() {
@@ -31,40 +33,54 @@ export class AudioService {
 
     async initialize() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    sampleRate: 44100
-                }
-            });
-            this.stream = stream;
-            this.audioContext = new AudioContext();
-            this.source = this.audioContext.createMediaStreamSource(stream);
+            if (!this.stream) {
+                this.stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    }
+                });
+                
+                this.audioContext = new AudioContext();
+                this.source = this.audioContext.createMediaStreamSource(this.stream);
+            }
             return true;
         } catch (error) {
             console.error('Audio initialization failed:', error);
+            
             if (error.name === 'NotAllowedError') {
                 alert('Please allow microphone access in your browser settings');
+            } else if (error.name === 'NotFoundError') {
+                alert('No microphone found. Please connect a microphone and try again.');
             }
             return false;
         }
     }
 
-    startRecording() {
-        if (!this.stream) return false;
+    async startRecording() {
+        if (!this.stream) {
+            const initialized = await this.initialize();
+            if (!initialized) return false;
+        }
+
         this.mediaRecorder = new MediaRecorder(this.stream);
         this.audioChunks = [];
         
         this.mediaRecorder.ondataavailable = (event) => {
-            this.audioChunks.push(event.data);
+            if (event.data.size > 0) {
+                this.audioChunks.push(event.data);
+            }
         };
         
         this.mediaRecorder.start();
         return true;
     }
 
-    stopRecording() {
+    async stopRecording() {
+        if (!this.mediaRecorder || this.mediaRecorder.state === 'inactive') {
+            return null;
+        }
+
         return new Promise((resolve) => {
             this.mediaRecorder.onstop = () => {
                 const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
@@ -72,6 +88,20 @@ export class AudioService {
             };
             this.mediaRecorder.stop();
         });
+    }
+
+    cleanup() {
+        if (this.stream) {
+            this.stream.getTracks().forEach(track => track.stop());
+            this.stream = null;
+        }
+        if (this.audioContext) {
+            this.audioContext.close();
+            this.audioContext = null;
+        }
+        this.source = null;
+        this.mediaRecorder = null;
+        this.audioChunks = [];
     }
 }
 
