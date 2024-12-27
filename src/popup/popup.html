@@ -11,7 +11,8 @@
         <div id="permission-view" class="view">
             <h2>Setup Microphone</h2>
             <div class="permission-content">
-                <p>This app needs microphone access to record your speech.</p>
+                <img src="../../assets/icons/icon128.png" alt="App Icon" class="app-icon">
+                <p>This app needs microphone access to record your speech for English practice.</p>
                 <button id="request-permission" class="btn primary">
                     Allow Microphone Access
                 </button>
@@ -23,12 +24,12 @@
             <h2>API Setup</h2>
             <div class="form-group">
                 <label for="gemini-key">Gemini API Key</label>
-                <input type="password" id="gemini-key" required>
+                <input type="password" id="gemini-key" placeholder="Enter your Gemini API key" required>
                 <div class="hint">Required for AI feedback</div>
             </div>
             <div class="form-group">
                 <label for="elevenlabs-key">ElevenLabs API Key</label>
-                <input type="password" id="elevenlabs-key">
+                <input type="password" id="elevenlabs-key" placeholder="Enter your ElevenLabs API key (optional)">
                 <div class="hint">Optional for voice response</div>
             </div>
             <button id="save-setup" class="btn primary">Save & Continue</button>
@@ -36,9 +37,45 @@
 
         <!-- 主练习视图 -->
         <div id="practice-view" class="view hidden">
-            <!-- 原有的practice内容 -->
+            <div class="practice-header">
+                <h2>English Speaking Practice</h2>
+                <button id="settings" class="btn secondary small">Settings</button>
+            </div>
+
+            <div class="recording-section">
+                <canvas id="visualizer" class="audio-visualizer"></canvas>
+                <div class="controls">
+                    <button id="start-recording" class="btn primary">Start Speaking</button>
+                    <button id="stop-recording" class="btn secondary" disabled>Stop</button>
+                </div>
+            </div>
+
+            <!-- 加载提示 -->
+            <div id="loading" class="loading-section hidden">
+                <div class="spinner"></div>
+                <p>Processing your speech...</p>
+            </div>
+
+            <!-- 反馈区域 -->
+            <div id="feedback" class="feedback-section hidden">
+                <div class="recognized-speech">
+                    <h3>Your Speech:</h3>
+                    <p id="recognized-text"></p>
+                </div>
+
+                <div class="ai-feedback">
+                    <h3>AI Feedback:</h3>
+                    <div id="ai-feedback"></div>
+                </div>
+
+                <div class="next-practice">
+                    <h3>Try This Next:</h3>
+                    <p id="next-suggestion"></p>
+                </div>
+            </div>
         </div>
     </div>
+
     <script type="module" src="popup.js"></script>
 </body>
 </html>

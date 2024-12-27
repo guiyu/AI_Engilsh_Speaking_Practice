@@ -29,10 +29,29 @@ export class SpeechRecognition {
 
         this.recognition.onerror = (event) => {
             console.error('Speech recognition error:', event.error);
+            if(event.error === 'not-allowed') {
+                throw new Error('Microphone access denied');
+            }
         };
     }
 
-    start() {
+    async requestPermission() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream.getTracks().forEach(track => track.stop());
+            return true;
+        } catch (error) {
+            console.error('Permission request failed:', error);
+            return false;
+        }
+    }
+
+    async start() {
+        const hasPermission = await this.requestPermission();
+        if (!hasPermission) {
+            throw new Error('Microphone permission is required');
+        }
+        
         this.transcript = '';
         this.recognition.start();
     }
