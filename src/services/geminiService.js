@@ -1,20 +1,42 @@
+// src/services/geminiService.js
+
 export class GeminiService {
     constructor(apiKey) {
         this.apiKey = apiKey;
         this.baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+        this.context = [];
+    }
+
+    async initializeChat() {
+        const initialPrompt = `你是一名专业的英语口语指导老师，你需要帮助用户纠正语法发音，用户将会说一句英文，然后你会给出识别出来的英语是什么，并且告诉他发音中有什么问题，语法有什么错误，并且一步一步的纠正他的发音，当一次发音正确后，根据当前语句提出下一个场景的语句,然后一直循环这个过程。你的回答永远要保持中文。`;
+        
+        const response = await this.generateResponse(initialPrompt);
+        if (response.includes('OK')) {
+            return true;
+        }
+        return false;
     }
 
     async processAudio(text) {
-        const prompt = `你是一名专业的英语口语指导老师，请分析以下识别出的英语文本并提供反馈：
-"${text}"
+        const prompt = `用户说的英语是："${text}"
+请按以下格式提供分析：
 
-请提供以下方面的分析：
-1. 语法正确性
-2. 表达是否地道
-3. 可能的发音问题
+1. 语音识别结果
+2. 语法分析
+3. 发音要点
 4. 改进建议
-5. 基于当前对话情境，建议下一个练习句子`;
+5. 场景练习建议`;
 
+        try {
+            const response = await this.generateResponse(prompt);
+            return this.parseResponse(response);
+        } catch (error) {
+            console.error('Gemini API error:', error);
+            throw new Error('AI反馈生成失败');
+        }
+    }
+
+    async generateResponse(prompt) {
         try {
             const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
                 method: 'POST',
@@ -23,9 +45,8 @@ export class GeminiService {
                 },
                 body: JSON.stringify({
                     contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
+                        role: 'user',
+                        parts: [{ text: prompt }]
                     }],
                     generationConfig: {
                         temperature: 0.7,
@@ -36,29 +57,27 @@ export class GeminiService {
                 })
             });
 
+            if (!response.ok) {
+                throw new Error('API请求失败');
+            }
+
             const data = await response.json();
-            return this.parseGeminiResponse(data);
+            return data.candidates[0].content.parts[0].text;
         } catch (error) {
             console.error('Gemini API error:', error);
-            throw new Error('Failed to get AI feedback');
+            throw error;
         }
     }
 
-    parseGeminiResponse(data) {
-        try {
-            const text = data.candidates[0].content.parts[0].text;
-            const sections = text.split('\n\n');
-            
-            return {
-                grammar: sections.find(s => s.includes('语法'))?.replace('语法：', '').trim(),
-                expression: sections.find(s => s.includes('表达'))?.replace('表达：', '').trim(),
-                pronunciation: sections.find(s => s.includes('发音'))?.replace('发音：', '').trim(),
-                suggestions: sections.find(s => s.includes('建议'))?.replace('建议：', '').trim(),
-                nextPrompt: sections.find(s => s.includes('下一个练习'))?.replace('下一个练习：', '').trim()
-            };
-        } catch (error) {
-            console.error('Error parsing Gemini response:', error);
-            throw new Error('Failed to parse AI feedback');
-        }
+    parseResponse(response) {
+        const sections = response.split('\n\n');
+        
+        return {
+            recognition: sections.find(s => s.includes('语音识别'))?.split('语音识别结果：')[1]?.trim() || '',
+            grammar: sections.find(s => s.includes('语法'))?.split('语法分析：')[1]?.trim() || '',
+            pronunciation: sections.find(s => s.includes('发音'))?.split('发音要点：')[1]?.trim() || '',
+            suggestions: sections.find(s => s.includes('改进建议'))?.split('改进建议：')[1]?.trim() || '',
+            nextPrompt: sections.find(s => s.includes('场景练习'))?.split('场景练习建议：')[1]?.trim() || ''
+        };
     }
 }

@@ -50,16 +50,53 @@ class PopupManager {
 
     async initializeUI() {
         this.initializeDOMElements();
+        await this.checkMicrophonePermission();
+        await this.checkApiKeys();
+        this.setupEventListeners();
+    }
+
+    async checkMicrophonePermission() {
+        const micStatus = document.getElementById('mic-status');
+        const statusIcon = micStatus?.querySelector('.status-icon');
+        const statusText = micStatus?.querySelector('.status-text');
+    
         try {
-            const result = await this.audioService.initialize();
-            if (result) {
-                await this.checkApiSetup();
+            const permissionResult = await navigator.permissions.query({ name: 'microphone' });
+            
+            if (permissionResult.state === 'granted') {
+                if (statusIcon) statusIcon.textContent = '✅';
+                if (statusText) statusText.textContent = '已授权';
+                this.updateSaveButtonState();
             } else {
-                this.showPermissionView();
+                if (statusIcon) statusIcon.textContent = '⚠️';
+                if (statusText) statusText.textContent = '未授权';
+                document.getElementById('check-mic')?.classList.remove('hidden');
             }
         } catch (error) {
             console.error('Permission check failed:', error);
-            this.showPermissionView();
+            if (statusIcon) statusIcon.textContent = '❌';
+            if (statusText) statusText.textContent = '检查失败';
+        }
+    }
+
+    async checkApiKeys() {
+        const keys = await StorageManager.getKeys();
+        if (keys.geminiKey) {
+            document.getElementById('gemini-key').value = keys.geminiKey;
+        }
+        if (keys.elevenlabsKey) {
+            document.getElementById('elevenlabs-key').value = keys.elevenlabsKey;
+        }
+        this.updateSaveButtonState();
+    }
+
+    updateSaveButtonState() {
+        const saveButton = document.getElementById('save-setup');
+        const geminiKey = document.getElementById('gemini-key')?.value;
+        const micStatus = document.getElementById('mic-status')?.querySelector('.status-text')?.textContent;
+    
+        if (saveButton) {
+            saveButton.disabled = !(geminiKey && micStatus === '已授权');
         }
     }
 
@@ -82,27 +119,39 @@ class PopupManager {
     }
 
     setupEventListeners() {
-        // 权限请求按钮
-        if (this.requestPermissionBtn) {
-            this.requestPermissionBtn.addEventListener('click', () => this.requestMicrophonePermission());
-        }
+         // 添加麦克风检查按钮事件
+        document.getElementById('check-mic')?.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop());
+                await this.checkMicrophonePermission();
+            } catch (error) {
+                console.error('Microphone permission request failed:', error);
+            }
+        });
 
-        // 设置保存按钮
-        if (this.saveSetupBtn) {
-            this.saveSetupBtn.addEventListener('click', async () => {
-                const geminiKey = document.getElementById('gemini-key')?.value;
-                const elevenlabsKey = document.getElementById('elevenlabs-key')?.value;
-                
-                if (!geminiKey) {
-                    alert('Gemini API Key is required');
-                    return;
-                }
-                
+        // API密钥输入事件
+        document.getElementById('gemini-key')?.addEventListener('input', () => {
+            this.updateSaveButtonState();
+        });
+
+        // 设置按钮事件
+        document.getElementById('settings')?.addEventListener('click', () => {
+            this.showSetupView();
+        });
+
+        // 保存设置事件
+        document.getElementById('save-setup')?.addEventListener('click', async () => {
+            const geminiKey = document.getElementById('gemini-key')?.value;
+            const elevenlabsKey = document.getElementById('elevenlabs-key')?.value;
+
+            if (geminiKey) {
                 await StorageManager.saveKeys(geminiKey, elevenlabsKey);
                 this.setupServices({ geminiKey, elevenlabsKey });
+                await this.initializeAIServices();
                 this.showPracticeView();
-            });
-        }
+            }
+        });
 
         // 录音控制按钮
         if (this.startRecordingBtn) {
@@ -110,6 +159,19 @@ class PopupManager {
         }
         if (this.stopRecordingBtn) {
             this.stopRecordingBtn.addEventListener('click', () => this.stopRecording());
+        }
+    }
+
+    async initializeAIServices() {
+        try {
+            // 初始化 Gemini 服务
+            const initialized = await this.geminiService.initializeChat();
+            if (!initialized) {
+                throw new Error('AI服务初始化失败');
+            }
+        } catch (error) {
+            console.error('AI service initialization failed:', error);
+            alert('AI服务初始化失败，请检查API密钥是否正确');
         }
     }
 
