@@ -30,19 +30,16 @@ class PopupManager {
     }
 
     initializeDOMElements() {
-        // 获取视图元素
-        this.permissionView = document.getElementById('permission-view');
+        // 获取视图元素 - 移除不存在的permission-view引用
         this.setupView = document.getElementById('setup-view');
         this.practiceView = document.getElementById('practice-view');
         
         // 获取按钮元素
-        this.requestPermissionBtn = document.getElementById('request-permission');
-        this.saveSetupBtn = document.getElementById('save-setup');
         this.startRecordingBtn = document.getElementById('start-recording');
         this.stopRecordingBtn = document.getElementById('stop-recording');
         
-        // 验证所有必要的DOM元素都存在
-        if (!this.permissionView || !this.setupView || !this.practiceView) {
+        // 验证必要的DOM元素存在
+        if (!this.setupView || !this.practiceView) {
             console.error('Required DOM elements not found');
             return;
         }
@@ -190,24 +187,22 @@ class PopupManager {
     }
 
     showPermissionView() {
-        if (this.permissionView && this.setupView && this.practiceView) {
-            this.permissionView.classList.remove('hidden');
+        // 移除对不存在的permissionView的引用
+        if (this.setupView && this.practiceView) {
             this.setupView.classList.add('hidden');
             this.practiceView.classList.add('hidden');
         }
     }
 
     showSetupView() {
-        if (this.permissionView && this.setupView && this.practiceView) {
-            this.permissionView.classList.add('hidden');
+        if (this.setupView && this.practiceView) {
             this.setupView.classList.remove('hidden');
             this.practiceView.classList.add('hidden');
         }
     }
 
     showPracticeView() {
-        if (this.permissionView && this.setupView && this.practiceView) {
-            this.permissionView.classList.add('hidden');
+        if (this.setupView && this.practiceView) {
             this.setupView.classList.add('hidden');
             this.practiceView.classList.remove('hidden');
         }
