@@ -6,6 +6,7 @@ export class AudioService {
         this.audioChunks = [];
         this.audioContext = null;
         this.source = null;
+        this.isRecording = false;
     }
 
     async initialize() {
@@ -26,22 +27,21 @@ export class AudioService {
             return true;
         } catch (error) {
             console.error('Audio initialization failed:', error);
-            if (error.name === 'NotAllowedError') {
-                return false;
-            } else if (error.name === 'NotFoundError') {
-                alert('No microphone found. Please connect a microphone and try again.');
-            }
             return false;
         }
     }
 
     async startRecording() {
-        if (!this.stream) {
-            const initialized = await this.initialize();
-            if (!initialized) return false;
+        if (this.isRecording) {
+            return false;
         }
 
         try {
+            if (!this.stream) {
+                const initialized = await this.initialize();
+                if (!initialized) return false;
+            }
+
             this.mediaRecorder = new MediaRecorder(this.stream);
             this.audioChunks = [];
             
@@ -52,6 +52,7 @@ export class AudioService {
             };
             
             this.mediaRecorder.start();
+            this.isRecording = true;
             return true;
         } catch (error) {
             console.error('Failed to start recording:', error);
@@ -60,13 +61,15 @@ export class AudioService {
     }
 
     async stopRecording() {
-        if (!this.mediaRecorder || this.mediaRecorder.state === 'inactive') {
+        if (!this.isRecording || !this.mediaRecorder) {
             return null;
         }
 
         return new Promise((resolve) => {
             this.mediaRecorder.onstop = () => {
                 const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+                this.isRecording = false;
+                this.audioChunks = [];
                 resolve(audioBlob);
             };
             this.mediaRecorder.stop();
@@ -85,5 +88,6 @@ export class AudioService {
         this.source = null;
         this.mediaRecorder = null;
         this.audioChunks = [];
+        this.isRecording = false;
     }
 }

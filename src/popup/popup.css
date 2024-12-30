@@ -208,3 +208,101 @@ input {
     align-items: center;
     margin-bottom: 20px;
 }
+
+/* 在现有的 popup.css 中添加以下样式 */
+
+/* 按钮动画效果 */
+.btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn:active {
+    transform: scale(0.95);
+}
+
+.btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: button-loading-spinner 0.6s linear infinite;
+}
+
+@keyframes button-loading-spinner {
+    from {
+        transform: rotate(0turn);
+    }
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+/* 成功状态样式 */
+.btn.success {
+    background-color: var(--success) !important;
+    color: white !important;
+}
+
+/* 错误状态样式 */
+.btn.error {
+    background-color: var(--error) !important;
+    color: white !important;
+}
+
+/* 状态图标 */
+.status-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
+
+/* Toast消息样式 */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 4px;
+    z-index: 1000;
+    animation: toast-in 0.3s ease forwards;
+}
+
+@keyframes toast-in {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 保存设置按钮特殊样式 */
+#save-setup.saving {
+    position: relative;
+    padding-right: 40px;
+}
+
+#save-setup.saving::after {
+    right: 10px;
+    margin: -10px 0 0 0;
+}
