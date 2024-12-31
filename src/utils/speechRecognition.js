@@ -25,6 +25,11 @@ export class SpeechRecognition {
             }
 
             this.transcript = finalTranscript || interimTranscript;
+
+            const recognizedTextElement = document.getElementById('recognized-text');
+            if (recognizedTextElement) {
+                recognizedTextElement.textContent = this.transcript;
+            }
         };
 
         this.recognition.onerror = (event) => {

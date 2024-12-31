@@ -21,6 +21,13 @@ class PopupManager {
         this.setupView = null;
         this.practiceView = null;
         this.isProcessing = false;
+
+        this.recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0].transcript)
+                .join('');
+            document.getElementById('recognized-text').textContent = transcript;
+        };
         
         // 确保DOM加载完成后再初始化UI
         document.addEventListener('DOMContentLoaded', () => {
@@ -28,6 +35,7 @@ class PopupManager {
             this.initializeUI();
             this.setupEventListeners();
         });
+        
     }
 
     initializeDOMElements() {
@@ -322,6 +330,9 @@ class PopupManager {
 
         try {
             this.setButtonState(startButton, 'loading', '准备录音...');
+
+             // 增加语音识别的启动
+            await this.recognition.start(); // 添加此行
             
             // 设置录音停止回调
             this.audioService.setRecordingStoppedCallback(async (audioBlob) => {
