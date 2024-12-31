@@ -20,6 +20,7 @@ class PopupManager {
         this.permissionView = null;
         this.setupView = null;
         this.practiceView = null;
+        this.isProcessing = false;
         
         // 确保DOM加载完成后再初始化UI
         document.addEventListener('DOMContentLoaded', () => {
@@ -30,19 +31,16 @@ class PopupManager {
     }
 
     initializeDOMElements() {
-        // 获取视图元素
-        this.permissionView = document.getElementById('permission-view');
+        // 获取视图元素 - 移除不存在的permission-view引用
         this.setupView = document.getElementById('setup-view');
         this.practiceView = document.getElementById('practice-view');
         
         // 获取按钮元素
-        this.requestPermissionBtn = document.getElementById('request-permission');
-        this.saveSetupBtn = document.getElementById('save-setup');
         this.startRecordingBtn = document.getElementById('start-recording');
         this.stopRecordingBtn = document.getElementById('stop-recording');
         
-        // 验证所有必要的DOM元素都存在
-        if (!this.permissionView || !this.setupView || !this.practiceView) {
+        // 验证必要的DOM元素存在
+        if (!this.setupView || !this.practiceView) {
             console.error('Required DOM elements not found');
             return;
         }
@@ -112,7 +110,17 @@ class PopupManager {
     }
 
     setupServices(keys) {
-        this.geminiService = new GeminiService(keys.geminiKey);
+        if (keys.geminiKey) {
+            // 确保GeminiService实例被正确创建
+            try {
+                this.geminiService = new GeminiService(keys.geminiKey);
+                console.log('Gemini service created successfully');
+            } catch (error) {
+                console.error('Failed to create Gemini service:', error);
+                throw new Error('Gemini服务创建失败');
+            }
+        }
+    
         if (keys.elevenlabsKey) {
             this.elevenlabsService = new ElevenlabsService(keys.elevenlabsKey);
         }
@@ -129,6 +137,10 @@ class PopupManager {
                 console.error('Microphone permission request failed:', error);
             }
         });
+
+        document.getElementById('save-setup')?.addEventListener('click', () => this.handleSaveSetup());
+        document.getElementById('start-recording')?.addEventListener('click', () => this.handleStartRecording());
+        document.getElementById('stop-recording')?.addEventListener('click', () => this.handleStopRecording());
 
         // API密钥输入事件
         document.getElementById('gemini-key')?.addEventListener('input', () => {
@@ -164,14 +176,23 @@ class PopupManager {
 
     async initializeAIServices() {
         try {
-            // 初始化 Gemini 服务
-            const initialized = await this.geminiService.initializeChat();
-            if (!initialized) {
-                throw new Error('AI服务初始化失败');
+            if (!this.geminiService) {
+                throw new Error('Gemini服务未正确初始化');
             }
+    
+            console.log('Starting AI service initialization...');
+            const initialized = await this.geminiService.initializeChat();
+            console.log('AI service initialization result:', initialized);
+    
+            if (!initialized) {
+                console.error('AI service initialization returned false');
+                return false;
+            }
+    
+            return true;
         } catch (error) {
-            console.error('AI service initialization failed:', error);
-            alert('AI服务初始化失败，请检查API密钥是否正确');
+            console.error('AI service initialization error:', error);
+            throw error;
         }
     }
 
@@ -190,27 +211,188 @@ class PopupManager {
     }
 
     showPermissionView() {
-        if (this.permissionView && this.setupView && this.practiceView) {
-            this.permissionView.classList.remove('hidden');
+        // 移除对不存在的permissionView的引用
+        if (this.setupView && this.practiceView) {
             this.setupView.classList.add('hidden');
             this.practiceView.classList.add('hidden');
         }
     }
 
     showSetupView() {
-        if (this.permissionView && this.setupView && this.practiceView) {
-            this.permissionView.classList.add('hidden');
+        if (this.setupView && this.practiceView) {
             this.setupView.classList.remove('hidden');
             this.practiceView.classList.add('hidden');
         }
     }
 
     showPracticeView() {
-        if (this.permissionView && this.setupView && this.practiceView) {
-            this.permissionView.classList.add('hidden');
+        if (this.setupView && this.practiceView) {
             this.setupView.classList.add('hidden');
             this.practiceView.classList.remove('hidden');
         }
+    }
+
+    showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    setButtonState(button, state, message) {
+        if (!button) return;
+        
+        // 重置所有状态
+        button.classList.remove('loading', 'success', 'error');
+        
+        switch (state) {
+            case 'loading':
+                button.classList.add('loading');
+                button.disabled = true;
+                if (message) button.textContent = message;
+                break;
+            case 'success':
+                button.classList.add('success');
+                setTimeout(() => {
+                    button.classList.remove('success');
+                }, 2000);
+                if (message) button.textContent = message;
+                break;
+            case 'error':
+                button.classList.add('error');
+                setTimeout(() => {
+                    button.classList.remove('error');
+                }, 2000);
+                if (message) button.textContent = message;
+                break;
+            case 'default':
+                button.disabled = false;
+                if (message) button.textContent = message;
+                break;
+        }
+    }
+
+    async handleSaveSetup() {
+        const saveButton = document.getElementById('save-setup');
+        const geminiKey = document.getElementById('gemini-key')?.value;
+        const elevenlabsKey = document.getElementById('elevenlabs-key')?.value;
+    
+        try {
+            this.setButtonState(saveButton, 'loading', '保存中...');
+    
+            if (geminiKey) {
+                // 先保存密钥
+                await StorageManager.saveKeys(geminiKey, elevenlabsKey);
+                
+                // 设置服务
+                this.setupServices({ geminiKey, elevenlabsKey });
+                
+                // 尝试初始化AI服务
+                try {
+                    const initResult = await this.initializeAIServices();
+                    if (!initResult) {
+                        throw new Error('AI服务初始化失败');
+                    }
+                    
+                    this.setButtonState(saveButton, 'success', '保存成功');
+                    this.showToast('设置已保存，正在切换到练习界面');
+                    setTimeout(() => this.showPracticeView(), 1500);
+                } catch (initError) {
+                    throw new Error('AI服务初始化失败: ' + initError.message);
+                }
+            }
+        } catch (error) {
+            console.error('Save setup error:', error);
+            this.setButtonState(saveButton, 'error', '保存失败');
+            this.showToast(error.message, 'error');
+            setTimeout(() => {
+                this.setButtonState(saveButton, 'default', '保存并开始练习');
+            }, 2000);
+        }
+    }
+
+    async handleStartRecording() {
+        const startButton = document.getElementById('start-recording');
+        const stopButton = document.getElementById('stop-recording');
+        const visualizer = document.getElementById('visualizer');
+
+        try {
+            this.setButtonState(startButton, 'loading', '准备录音...');
+            
+            // 设置录音停止回调
+            this.audioService.setRecordingStoppedCallback(async (audioBlob) => {
+                if (this.visualizer) {
+                    this.visualizer.stop();
+                }
+                await this.processSpeech('');  // 触发语音处理
+            });
+
+            const success = await this.audioService.startRecording();
+            
+            if (success) {
+                if (!this.visualizer && visualizer) {
+                    this.visualizer = new AudioVisualizer(visualizer);
+                    this.visualizer.initialize(this.audioService.audioContext, this.audioService.source);
+                }
+
+                this.setButtonState(startButton, 'success', '录音中');
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                this.showToast('录音已开始');
+            } else {
+                throw new Error('无法启动录音');
+            }
+        } catch (error) {
+            console.error('Start recording error:', error);
+            this.setButtonState(startButton, 'error', '启动失败');
+            this.showToast(error.message, 'error');
+            setTimeout(() => {
+                this.setButtonState(startButton, 'default', '开始说话');
+            }, 2000);
+        }
+    }
+
+    async handleStopRecording() {
+        if (this.isProcessing) return;
+
+        const startButton = document.getElementById('start-recording');
+        const stopButton = document.getElementById('stop-recording');
+
+        try {
+            this.isProcessing = true;
+            this.setButtonState(stopButton, 'loading', '停止中...');
+            
+            await this.audioService.stopRecording();
+            
+            this.setButtonState(stopButton, 'success', '已停止');
+            
+            // 按钮状态会在处理完成后在processSpeech中重置
+        } catch (error) {
+            console.error('Stop recording error:', error);
+            this.setButtonState(stopButton, 'error', '停止失败');
+            this.showToast(error.message, 'error');
+            this.resetRecordingState();
+        }
+    }
+
+    resetRecordingState() {
+        const startButton = document.getElementById('start-recording');
+        const stopButton = document.getElementById('stop-recording');
+
+        if (startButton) {
+            startButton.disabled = false;
+            this.setButtonState(startButton, 'default', '开始说话');
+        }
+        if (stopButton) {
+            stopButton.disabled = true;
+            this.setButtonState(stopButton, 'default', '停止');
+        }
+
+        this.isProcessing = false;
     }
 
     async startRecording() {
@@ -254,26 +436,36 @@ class PopupManager {
     async processSpeech(text) {
         const loadingElement = document.getElementById('loading');
         const feedbackElement = document.getElementById('feedback');
+        const startButton = document.getElementById('start-recording');
+        const stopButton = document.getElementById('stop-recording');
         
         try {
             if (loadingElement) loadingElement.classList.remove('hidden');
             if (feedbackElement) feedbackElement.classList.add('hidden');
             
             const recognizedTextElement = document.getElementById('recognized-text');
-            if (recognizedTextElement) recognizedTextElement.textContent = text;
+            if (recognizedTextElement) {
+                recognizedTextElement.textContent = text || '处理中...';
+            }
             
             const feedback = await this.geminiService.processAudio(text);
             this.displayFeedback(feedback);
             
-            if (this.elevenlabsService) {
-                const audio = await this.elevenlabsService.synthesizeSpeech(feedback.suggestions);
-                audio.play();
+            if (this.elevenlabsService && feedback.suggestions) {
+                try {
+                    const audio = await this.elevenlabsService.synthesizeSpeech(feedback.suggestions);
+                    audio.play();
+                } catch (error) {
+                    console.error('Speech synthesis error:', error);
+                }
             }
         } catch (error) {
-            alert('Error processing speech: ' + error.message);
+            console.error('Process speech error:', error);
+            this.showToast('处理语音时出错: ' + error.message, 'error');
         } finally {
             if (loadingElement) loadingElement.classList.add('hidden');
             if (feedbackElement) feedbackElement.classList.remove('hidden');
+            this.resetRecordingState();
         }
     }
 
