@@ -1,4 +1,5 @@
 // src/services/audioService.js
+
 export class AudioService {
     constructor() {
         this.stream = null;
@@ -7,6 +8,7 @@ export class AudioService {
         this.audioContext = null;
         this.source = null;
         this.isRecording = false;
+        this.recordingStoppedCallback = null;
     }
 
     async initialize() {
@@ -29,6 +31,10 @@ export class AudioService {
             console.error('Audio initialization failed:', error);
             return false;
         }
+    }
+
+    setRecordingStoppedCallback(callback) {
+        this.recordingStoppedCallback = callback;
     }
 
     async startRecording() {
@@ -66,17 +72,24 @@ export class AudioService {
         }
 
         return new Promise((resolve) => {
-            this.mediaRecorder.onstop = () => {
+            this.mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
                 this.isRecording = false;
                 this.audioChunks = [];
+
+                if (this.recordingStoppedCallback) {
+                    await this.recordingStoppedCallback(audioBlob);
+                }
                 resolve(audioBlob);
             };
+
             this.mediaRecorder.stop();
+            this.source?.disconnect();
         });
     }
 
     cleanup() {
+        this.isRecording = false;
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
             this.stream = null;
@@ -85,9 +98,11 @@ export class AudioService {
             this.audioContext.close();
             this.audioContext = null;
         }
-        this.source = null;
+        if (this.source) {
+            this.source.disconnect();
+            this.source = null;
+        }
         this.mediaRecorder = null;
         this.audioChunks = [];
-        this.isRecording = false;
     }
 }

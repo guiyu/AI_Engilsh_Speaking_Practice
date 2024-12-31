@@ -20,6 +20,7 @@ class PopupManager {
         this.permissionView = null;
         this.setupView = null;
         this.practiceView = null;
+        this.isProcessing = false;
         
         // 确保DOM加载完成后再初始化UI
         document.addEventListener('DOMContentLoaded', () => {
@@ -317,12 +318,27 @@ class PopupManager {
     async handleStartRecording() {
         const startButton = document.getElementById('start-recording');
         const stopButton = document.getElementById('stop-recording');
+        const visualizer = document.getElementById('visualizer');
 
         try {
             this.setButtonState(startButton, 'loading', '准备录音...');
+            
+            // 设置录音停止回调
+            this.audioService.setRecordingStoppedCallback(async (audioBlob) => {
+                if (this.visualizer) {
+                    this.visualizer.stop();
+                }
+                await this.processSpeech('');  // 触发语音处理
+            });
+
             const success = await this.audioService.startRecording();
             
             if (success) {
+                if (!this.visualizer && visualizer) {
+                    this.visualizer = new AudioVisualizer(visualizer);
+                    this.visualizer.initialize(this.audioService.audioContext, this.audioService.source);
+                }
+
                 this.setButtonState(startButton, 'success', '录音中');
                 startButton.disabled = true;
                 stopButton.disabled = false;
@@ -341,29 +357,42 @@ class PopupManager {
     }
 
     async handleStopRecording() {
+        if (this.isProcessing) return;
+
         const startButton = document.getElementById('start-recording');
         const stopButton = document.getElementById('stop-recording');
 
         try {
+            this.isProcessing = true;
             this.setButtonState(stopButton, 'loading', '停止中...');
-            const text = await this.recognition.stop();
-            const audioBlob = await this.audioService.stopRecording();
+            
+            await this.audioService.stopRecording();
             
             this.setButtonState(stopButton, 'success', '已停止');
-            startButton.disabled = false;
-            stopButton.disabled = true;
             
-            await this.processSpeech(text);
-            
-            setTimeout(() => {
-                this.setButtonState(stopButton, 'default', '停止');
-                this.setButtonState(startButton, 'default', '开始说话');
-            }, 1500);
+            // 按钮状态会在处理完成后在processSpeech中重置
         } catch (error) {
             console.error('Stop recording error:', error);
             this.setButtonState(stopButton, 'error', '停止失败');
             this.showToast(error.message, 'error');
+            this.resetRecordingState();
         }
+    }
+
+    resetRecordingState() {
+        const startButton = document.getElementById('start-recording');
+        const stopButton = document.getElementById('stop-recording');
+
+        if (startButton) {
+            startButton.disabled = false;
+            this.setButtonState(startButton, 'default', '开始说话');
+        }
+        if (stopButton) {
+            stopButton.disabled = true;
+            this.setButtonState(stopButton, 'default', '停止');
+        }
+
+        this.isProcessing = false;
     }
 
     async startRecording() {
@@ -407,26 +436,36 @@ class PopupManager {
     async processSpeech(text) {
         const loadingElement = document.getElementById('loading');
         const feedbackElement = document.getElementById('feedback');
+        const startButton = document.getElementById('start-recording');
+        const stopButton = document.getElementById('stop-recording');
         
         try {
             if (loadingElement) loadingElement.classList.remove('hidden');
             if (feedbackElement) feedbackElement.classList.add('hidden');
             
             const recognizedTextElement = document.getElementById('recognized-text');
-            if (recognizedTextElement) recognizedTextElement.textContent = text;
+            if (recognizedTextElement) {
+                recognizedTextElement.textContent = text || '处理中...';
+            }
             
             const feedback = await this.geminiService.processAudio(text);
             this.displayFeedback(feedback);
             
-            if (this.elevenlabsService) {
-                const audio = await this.elevenlabsService.synthesizeSpeech(feedback.suggestions);
-                audio.play();
+            if (this.elevenlabsService && feedback.suggestions) {
+                try {
+                    const audio = await this.elevenlabsService.synthesizeSpeech(feedback.suggestions);
+                    audio.play();
+                } catch (error) {
+                    console.error('Speech synthesis error:', error);
+                }
             }
         } catch (error) {
-            alert('Error processing speech: ' + error.message);
+            console.error('Process speech error:', error);
+            this.showToast('处理语音时出错: ' + error.message, 'error');
         } finally {
             if (loadingElement) loadingElement.classList.add('hidden');
             if (feedbackElement) feedbackElement.classList.remove('hidden');
+            this.resetRecordingState();
         }
     }
 
