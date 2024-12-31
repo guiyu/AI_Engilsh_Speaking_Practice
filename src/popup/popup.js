@@ -109,7 +109,17 @@ class PopupManager {
     }
 
     setupServices(keys) {
-        this.geminiService = new GeminiService(keys.geminiKey);
+        if (keys.geminiKey) {
+            // 确保GeminiService实例被正确创建
+            try {
+                this.geminiService = new GeminiService(keys.geminiKey);
+                console.log('Gemini service created successfully');
+            } catch (error) {
+                console.error('Failed to create Gemini service:', error);
+                throw new Error('Gemini服务创建失败');
+            }
+        }
+    
         if (keys.elevenlabsKey) {
             this.elevenlabsService = new ElevenlabsService(keys.elevenlabsKey);
         }
@@ -165,14 +175,23 @@ class PopupManager {
 
     async initializeAIServices() {
         try {
-            // 初始化 Gemini 服务
-            const initialized = await this.geminiService.initializeChat();
-            if (!initialized) {
-                throw new Error('AI服务初始化失败');
+            if (!this.geminiService) {
+                throw new Error('Gemini服务未正确初始化');
             }
+    
+            console.log('Starting AI service initialization...');
+            const initialized = await this.geminiService.initializeChat();
+            console.log('AI service initialization result:', initialized);
+    
+            if (!initialized) {
+                console.error('AI service initialization returned false');
+                return false;
+            }
+    
+            return true;
         } catch (error) {
-            console.error('AI service initialization failed:', error);
-            alert('AI服务初始化失败，请检查API密钥是否正确');
+            console.error('AI service initialization error:', error);
+            throw error;
         }
     }
 
@@ -260,21 +279,29 @@ class PopupManager {
         const saveButton = document.getElementById('save-setup');
         const geminiKey = document.getElementById('gemini-key')?.value;
         const elevenlabsKey = document.getElementById('elevenlabs-key')?.value;
-
+    
         try {
             this.setButtonState(saveButton, 'loading', '保存中...');
-
+    
             if (geminiKey) {
+                // 先保存密钥
                 await StorageManager.saveKeys(geminiKey, elevenlabsKey);
+                
+                // 设置服务
                 this.setupServices({ geminiKey, elevenlabsKey });
                 
-                const initialized = await this.initializeAIServices();
-                if (initialized) {
+                // 尝试初始化AI服务
+                try {
+                    const initResult = await this.initializeAIServices();
+                    if (!initResult) {
+                        throw new Error('AI服务初始化失败');
+                    }
+                    
                     this.setButtonState(saveButton, 'success', '保存成功');
                     this.showToast('设置已保存，正在切换到练习界面');
                     setTimeout(() => this.showPracticeView(), 1500);
-                } else {
-                    throw new Error('AI服务初始化失败');
+                } catch (initError) {
+                    throw new Error('AI服务初始化失败: ' + initError.message);
                 }
             }
         } catch (error) {
