@@ -67,21 +67,36 @@ class PopupManager {
         const statusText = micStatus?.querySelector('.status-text');
     
         try {
+
+            // 首先尝试获取媒体设备权限
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    sampleRate: 48000
+                }
+             });
+            // 立即停止流，以释放麦克风
+             stream.getTracks().forEach(track => track.stop());
+            // 然后再查询权限状态
             const permissionResult = await navigator.permissions.query({ name: 'microphone' });
             
             if (permissionResult.state === 'granted') {
                 if (statusIcon) statusIcon.textContent = '✅';
                 if (statusText) statusText.textContent = '已授权';
                 this.updateSaveButtonState();
+                return true;
             } else {
                 if (statusIcon) statusIcon.textContent = '⚠️';
                 if (statusText) statusText.textContent = '未授权';
                 document.getElementById('check-mic')?.classList.remove('hidden');
+                return false;
             }
         } catch (error) {
             console.error('Permission check failed:', error);
             if (statusIcon) statusIcon.textContent = '❌';
             if (statusText) statusText.textContent = '检查失败';
+            return false;
         }
     }
 
@@ -329,7 +344,38 @@ class PopupManager {
         const visualizer = document.getElementById('visualizer');
 
         try {
+            // 首先检查权限
+            const hasPermission = await this.checkMicrophonePermission();
+            if (!hasPermission) {
+                throw new Error('需要麦克风访问权限');
+            }
+
             this.setButtonState(startButton, 'loading', '准备录音...');
+
+            // 确保 AudioService 已正确初始化
+            if (!this.audioService) {
+                this.audioService = new AudioService();
+                await this.audioService.initialize();
+            }
+
+            // 设置录音停止回调
+            this.audioService.setRecordingStoppedCallback(async (audioBlob) => {
+                if (this.visualizer) {
+                    this.visualizer.stop();
+                }
+                const recognizedText = await this.recognition?.stop();
+                await this.processSpeech(recognizedText || '');
+            });
+
+            // 先启动语音识别
+            if (this.recognition) {
+                try {
+                    await this.recognition.start();
+                } catch (recognitionError) {
+                    console.warn('Recognition start error:', recognitionError);
+                    // 继续执行，因为有些浏览器可能不支持语音识别
+                }
+            }
 
              // 增加语音识别的启动
             await this.recognition.start(); // 添加此行
@@ -359,8 +405,14 @@ class PopupManager {
             }
         } catch (error) {
             console.error('Start recording error:', error);
+            // 提供更具体的错误信息
+            const errorMessage = error.name === 'NotAllowedError' ? 
+                '请允许麦克风访问权限' : 
+                (error.message || '启动录音失败');
+                
             this.setButtonState(startButton, 'error', '启动失败');
-            this.showToast(error.message, 'error');
+            this.showToast(errorMessage, 'error');
+            
             setTimeout(() => {
                 this.setButtonState(startButton, 'default', '开始说话');
             }, 2000);

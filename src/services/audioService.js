@@ -14,6 +14,13 @@ export class AudioService {
     async initialize() {
         try {
             if (!this.stream) {
+                // 先检查权限
+                const permissionResult = await navigator.permissions.query({ name: 'microphone' });
+                
+                if (permissionResult.state === 'denied') {
+                    throw new Error('麦克风访问被拒绝');
+                }
+                
                 const stream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
                         echoCancellation: true,
@@ -29,7 +36,10 @@ export class AudioService {
             return true;
         } catch (error) {
             console.error('Audio initialization failed:', error);
-            return false;
+            if (error.name === 'NotAllowedError') {
+                throw new Error('请允许麦克风访问权限');
+            }
+            throw error;
         }
     }
 
