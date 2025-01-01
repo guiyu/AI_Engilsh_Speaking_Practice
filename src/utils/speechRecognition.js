@@ -10,6 +10,7 @@ export class SpeechRecognition {
         this.setupRecognition();
     }
 
+
     setupRecognition() {
         this.recognition.onresult = (event) => {
             let interimTranscript = '';
@@ -25,7 +26,8 @@ export class SpeechRecognition {
             }
 
             this.transcript = finalTranscript || interimTranscript;
-
+            
+            // 保持原有的DOM更新
             const recognizedTextElement = document.getElementById('recognized-text');
             if (recognizedTextElement) {
                 recognizedTextElement.textContent = this.transcript;
