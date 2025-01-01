@@ -6,7 +6,8 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "webNavigation"
   ],
   "host_permissions": [
     "*://*/*"
@@ -14,6 +15,13 @@
   "background": {
     "service_worker": "src/background/background.js",
     "type": "module"
+  },
+  "web_accessible_resources": [{
+    "resources": ["src/utils/audio-processor.js"],
+    "matches": ["<all_urls>"]
+  }],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "action": {
     "default_popup": "src/popup/popup.html",

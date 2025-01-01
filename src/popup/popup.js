@@ -6,6 +6,7 @@ import { ElevenlabsService } from '../services/elevenlabsService.js';
 import { StorageManager } from '../utils/storage.js';
 import { AudioVisualizer } from '../utils/audioVisualizer.js';
 import { SpeechRecognition } from '../utils/speechRecognition.js';
+import { WebSocketService } from '../services/websocketService.js'
 
 class PopupManager {
     constructor() {
@@ -122,26 +123,52 @@ class PopupManager {
     async checkApiSetup() {
         const keys = await StorageManager.getKeys();
         if (keys.geminiKey) {
-            this.setupServices(keys);
+            await this.setupServices(keys);  // 添加 await
             this.showPracticeView();
         } else {
             this.showSetupView();
         }
     }
 
-    setupServices(keys) {
+    async setupServices(keys) {
         if (keys.geminiKey) {
             try {
                 this.geminiService = new GeminiService(keys.geminiKey);
-                console.log('Gemini service created successfully');
+                // 初始化 WebSocket 服务
+                const wsService = new WebSocketService(keys.geminiKey);
+                wsService.setMessageCallback((response) => {
+                    this.handleWebSocketResponse(response);
+                });
+                await wsService.connect();
+                this.audioService.setWebSocketService(wsService);
+                console.log('Services created successfully');
             } catch (error) {
-                console.error('Failed to create Gemini service:', error);
-                throw new Error('Gemini服务创建失败');
+                console.error('Failed to create services:', error);
+                throw new Error('服务创建失败');
             }
         }
     
         if (keys.elevenlabsKey) {
             this.elevenlabsService = new ElevenlabsService(keys.elevenlabsKey);
+        }
+    }
+
+    handleWebSocketResponse(response) {
+        try {
+            console.log('Handling WebSocket response:', response); // 添加日志
+            
+            if (!response) {
+                console.error('Empty response received');
+                return;
+            }
+    
+            const feedback = this.geminiService.parseResponse(response);
+            if (feedback) {
+                this.displayFeedback(feedback);
+            }
+        } catch (error) {
+            console.error('处理WebSocket响应错误:', error);
+            this.showToast('处理响应时出错，请重试');
         }
     }
 
@@ -285,7 +312,7 @@ class PopupManager {
     
             if (geminiKey) {
                 await StorageManager.saveKeys(geminiKey, elevenlabsKey);
-                this.setupServices({ geminiKey, elevenlabsKey });
+                await this.setupServices({ geminiKey, elevenlabsKey });  // 添加 await
                 
                 try {
                     const initResult = await this.initializeAIServices();
@@ -331,7 +358,7 @@ class PopupManager {
             }
     
             // 设置录音停止回调
-            this.audioService.setRecordingStoppedCallback(async (audioBlob) => {
+            this.audioService.setRecordingStoppedCallback(async () => {
                 if (this.visualizer) {
                     this.visualizer.stop();
                 }
@@ -350,7 +377,6 @@ class PopupManager {
                     this.recognition.recognition.interimResults = true;
                     this.recognition.recognition.lang = 'en-US';
                 } catch (e) {
-                    // 忽略任何重置错误
                     console.log('Recognition reset ignored:', e);
                 }
             }
@@ -365,7 +391,7 @@ class PopupManager {
             }
     
             const success = await this.audioService.startRecording();
-                
+            
             if (success) {
                 if (!this.visualizer && visualizer) {
                     this.visualizer = new AudioVisualizer(visualizer);
@@ -379,7 +405,6 @@ class PopupManager {
             } else {
                 throw new Error('无法启动录音');
             }
-    
         } catch (error) {
             console.error('Start recording error:', error);
             const errorMessage = error.name === 'NotAllowedError' ? 
@@ -388,7 +413,7 @@ class PopupManager {
                     
             this.setButtonState(startButton, 'error', '启动失败');
             this.showToast(errorMessage, 'error');
-                
+            
             setTimeout(() => {
                 this.setButtonState(startButton, 'default', '开始说话');
             }, 2000);

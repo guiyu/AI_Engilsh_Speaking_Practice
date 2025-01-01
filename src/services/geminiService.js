@@ -155,27 +155,65 @@ export class GeminiService {
 
     parseResponse(response) {
         try {
-            console.log('Parsing response:', response);
-            if (!response.candidates || !response.candidates[0]) {
-                throw new Error('Invalid response format');
+            console.log('Parsing response:', response); // 添加日志
+    
+            if (!response) {
+                throw new Error('Empty response');
             }
-
-            const text = response.candidates[0].content?.parts?.[0]?.text || '';
-            console.log('Full AI response:', text);
-            const lines = text.split('\n');
-            
-            return {
-                recognition: this.extractContent(lines, '语音识别') || text,
-                grammar: this.extractContent(lines, '语法') || '语法正确',
-                pronunciation: this.extractContent(lines, '发音') || '发音正确',
-                suggestions: this.extractContent(lines, '建议') || '继续练习',
-                nextPrompt: this.extractContent(lines, '场景') || '尝试说一个新的句子'
-            };
+    
+            // 处理 candidates 格式的响应
+            if (response.candidates) {
+                const text = response.candidates[0]?.content?.parts?.[0]?.text || '';
+                console.log('Extracted text from candidates:', text);
+                return this.parseTextResponse(text);
+            }
+    
+            // 处理 serverContent 格式的响应
+            if (response.serverContent) {
+                const parts = response.serverContent.modelTurn?.parts || [];
+                const text = parts.map(part => part.text || '').join('\n');
+                console.log('Extracted text from serverContent:', text);
+                return this.parseTextResponse(text);
+            }
+    
+            throw new Error('Invalid response format');
         } catch (error) {
             console.error('Parse response error:', error);
-            throw error;
+            return {
+                recognition: 'Error: 无法解析响应',
+                grammar: '无法分析',
+                pronunciation: '无法分析',
+                suggestions: '请重试',
+                nextPrompt: '请说一个新的句子'
+            };
         }
     }
+
+    parseTextResponse(text) {
+        const sections = text.split('\n').filter(line => line.trim());
+        const result = {
+            recognition: '',
+            grammar: '',
+            pronunciation: '',
+            suggestions: '',
+            nextPrompt: '请说一个新的句子'
+        };
+    
+        for (const line of sections) {
+            if (line.includes('语音识别：')) {
+                result.recognition = line.split('：')[1]?.trim() || '';
+            } else if (line.includes('语法分析：')) {
+                result.grammar = line.split('：')[1]?.trim() || '';
+            } else if (line.includes('发音评估：')) {
+                result.pronunciation = line.split('：')[1]?.trim() || '';
+            } else if (line.includes('改进建议：')) {
+                result.suggestions = line.split('：')[1]?.trim() || '';
+            }
+        }
+    
+        return result;
+    }
+    
 
     extractContent(lines, key) {
         try {
