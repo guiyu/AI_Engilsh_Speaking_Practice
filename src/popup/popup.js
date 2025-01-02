@@ -6,6 +6,8 @@ import { ElevenlabsService } from '../services/elevenlabsService.js';
 import { StorageManager } from '../utils/storage.js';
 import { AudioVisualizer } from '../utils/audioVisualizer.js';
 import { SpeechRecognition } from '../utils/speechRecognition.js';
+import { WebSocketService } from '../services/websocketService.js'
+import { Logger } from '../utils/logger.js';
 
 class PopupManager {
     constructor() {
@@ -21,6 +23,13 @@ class PopupManager {
         this.setupView = null;
         this.practiceView = null;
         this.isProcessing = false;
+
+        this.recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0].transcript)
+                .join('');
+            document.getElementById('recognized-text').textContent = transcript;
+        };
         
         // 确保DOM加载完成后再初始化UI
         document.addEventListener('DOMContentLoaded', () => {
@@ -41,7 +50,7 @@ class PopupManager {
         
         // 验证必要的DOM元素存在
         if (!this.setupView || !this.practiceView) {
-            console.error('Required DOM elements not found');
+            Logger.error('Required DOM elements not found');
             return;
         }
     }
@@ -59,21 +68,35 @@ class PopupManager {
         const statusText = micStatus?.querySelector('.status-text');
     
         try {
+            // 首先尝试获取媒体设备权限
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    sampleRate: 48000
+                }
+            });
+            // 立即停止流，以释放麦克风
+            stream.getTracks().forEach(track => track.stop());
+            // 然后再查询权限状态
             const permissionResult = await navigator.permissions.query({ name: 'microphone' });
             
             if (permissionResult.state === 'granted') {
                 if (statusIcon) statusIcon.textContent = '✅';
                 if (statusText) statusText.textContent = '已授权';
                 this.updateSaveButtonState();
+                return true;
             } else {
                 if (statusIcon) statusIcon.textContent = '⚠️';
                 if (statusText) statusText.textContent = '未授权';
                 document.getElementById('check-mic')?.classList.remove('hidden');
+                return false;
             }
         } catch (error) {
-            console.error('Permission check failed:', error);
+            Logger.error('Permission check failed:', error);
             if (statusIcon) statusIcon.textContent = '❌';
             if (statusText) statusText.textContent = '检查失败';
+            return false;
         }
     }
 
@@ -98,26 +121,31 @@ class PopupManager {
         }
     }
 
-
     async checkApiSetup() {
         const keys = await StorageManager.getKeys();
         if (keys.geminiKey) {
-            this.setupServices(keys);
+            await this.setupServices(keys);  // 添加 await
             this.showPracticeView();
         } else {
             this.showSetupView();
         }
     }
 
-    setupServices(keys) {
+    async setupServices(keys) {
         if (keys.geminiKey) {
-            // 确保GeminiService实例被正确创建
             try {
                 this.geminiService = new GeminiService(keys.geminiKey);
-                console.log('Gemini service created successfully');
+                // 初始化 WebSocket 服务
+                const wsService = new WebSocketService(keys.geminiKey);
+                wsService.setMessageCallback((response) => {
+                    this.handleWebSocketResponse(response);
+                });
+                await wsService.connect();
+                this.audioService.setWebSocketService(wsService);
+                Logger.info('Services created successfully');
             } catch (error) {
-                console.error('Failed to create Gemini service:', error);
-                throw new Error('Gemini服务创建失败');
+                Logger.error('Failed to create services:', error);
+                throw new Error('服务创建失败');
             }
         }
     
@@ -126,21 +154,36 @@ class PopupManager {
         }
     }
 
+    handleWebSocketResponse(response) {
+        try {
+            Logger.info('Handling WebSocket response:', response); // 添加日志
+            
+            if (!response) {
+                Logger.error('Empty response received');
+                return;
+            }
+    
+            const feedback = this.geminiService.parseResponse(response);
+            if (feedback) {
+                this.displayFeedback(feedback);
+            }
+        } catch (error) {
+            Logger.error('处理WebSocket响应错误:', error);
+            this.showToast('处理响应时出错，请重试');
+        }
+    }
+
     setupEventListeners() {
-         // 添加麦克风检查按钮事件
+        // 添加麦克风检查按钮事件
         document.getElementById('check-mic')?.addEventListener('click', async () => {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 stream.getTracks().forEach(track => track.stop());
                 await this.checkMicrophonePermission();
             } catch (error) {
-                console.error('Microphone permission request failed:', error);
+                Logger.error('Microphone permission request failed:', error);
             }
         });
-
-        document.getElementById('save-setup')?.addEventListener('click', () => this.handleSaveSetup());
-        document.getElementById('start-recording')?.addEventListener('click', () => this.handleStartRecording());
-        document.getElementById('stop-recording')?.addEventListener('click', () => this.handleStopRecording());
 
         // API密钥输入事件
         document.getElementById('gemini-key')?.addEventListener('input', () => {
@@ -153,25 +196,11 @@ class PopupManager {
         });
 
         // 保存设置事件
-        document.getElementById('save-setup')?.addEventListener('click', async () => {
-            const geminiKey = document.getElementById('gemini-key')?.value;
-            const elevenlabsKey = document.getElementById('elevenlabs-key')?.value;
+        document.getElementById('save-setup')?.addEventListener('click', () => this.handleSaveSetup());
 
-            if (geminiKey) {
-                await StorageManager.saveKeys(geminiKey, elevenlabsKey);
-                this.setupServices({ geminiKey, elevenlabsKey });
-                await this.initializeAIServices();
-                this.showPracticeView();
-            }
-        });
-
-        // 录音控制按钮
-        if (this.startRecordingBtn) {
-            this.startRecordingBtn.addEventListener('click', () => this.startRecording());
-        }
-        if (this.stopRecordingBtn) {
-            this.stopRecordingBtn.addEventListener('click', () => this.stopRecording());
-        }
+        // 录音控制事件
+        document.getElementById('start-recording')?.addEventListener('click', () => this.handleStartRecording());
+        document.getElementById('stop-recording')?.addEventListener('click', () => this.handleStopRecording());
     }
 
     async initializeAIServices() {
@@ -180,18 +209,18 @@ class PopupManager {
                 throw new Error('Gemini服务未正确初始化');
             }
     
-            console.log('Starting AI service initialization...');
+            Logger.log('Starting AI service initialization...');
             const initialized = await this.geminiService.initializeChat();
-            console.log('AI service initialization result:', initialized);
+            Logger.info('AI service initialization result:', initialized);
     
             if (!initialized) {
-                console.error('AI service initialization returned false');
+                Logger.error('AI service initialization returned false');
                 return false;
             }
     
             return true;
         } catch (error) {
-            console.error('AI service initialization error:', error);
+            Logger.error('AI service initialization error:', error);
             throw error;
         }
     }
@@ -205,13 +234,12 @@ class PopupManager {
                 alert('Please allow microphone access in your browser settings and try again.');
             }
         } catch (error) {
-            console.error('Mic permission error:', error);
+            Logger.error('Mic permission error:', error);
             alert('Microphone access is required for this app to work.');
         }
     }
 
     showPermissionView() {
-        // 移除对不存在的permissionView的引用
         if (this.setupView && this.practiceView) {
             this.setupView.classList.add('hidden');
             this.practiceView.classList.add('hidden');
@@ -246,7 +274,6 @@ class PopupManager {
     setButtonState(button, state, message) {
         if (!button) return;
         
-        // 重置所有状态
         button.classList.remove('loading', 'success', 'error');
         
         switch (state) {
@@ -285,13 +312,9 @@ class PopupManager {
             this.setButtonState(saveButton, 'loading', '保存中...');
     
             if (geminiKey) {
-                // 先保存密钥
                 await StorageManager.saveKeys(geminiKey, elevenlabsKey);
+                await this.setupServices({ geminiKey, elevenlabsKey });  // 添加 await
                 
-                // 设置服务
-                this.setupServices({ geminiKey, elevenlabsKey });
-                
-                // 尝试初始化AI服务
                 try {
                     const initResult = await this.initializeAIServices();
                     if (!initResult) {
@@ -306,7 +329,7 @@ class PopupManager {
                 }
             }
         } catch (error) {
-            console.error('Save setup error:', error);
+            Logger.error('Save setup error:', error);
             this.setButtonState(saveButton, 'error', '保存失败');
             this.showToast(error.message, 'error');
             setTimeout(() => {
@@ -319,18 +342,55 @@ class PopupManager {
         const startButton = document.getElementById('start-recording');
         const stopButton = document.getElementById('stop-recording');
         const visualizer = document.getElementById('visualizer');
-
+    
         try {
+            // 首先检查权限
+            const hasPermission = await this.checkMicrophonePermission();
+            if (!hasPermission) {
+                throw new Error('需要麦克风访问权限');
+            }
+    
             this.setButtonState(startButton, 'loading', '准备录音...');
-            
+    
+            // 确保 AudioService 已正确初始化
+            if (!this.audioService) {
+                this.audioService = new AudioService();
+                await this.audioService.initialize();
+            }
+    
             // 设置录音停止回调
-            this.audioService.setRecordingStoppedCallback(async (audioBlob) => {
+            this.audioService.setRecordingStoppedCallback(async () => {
                 if (this.visualizer) {
                     this.visualizer.stop();
                 }
-                await this.processSpeech('');  // 触发语音处理
+                const recognizedText = await this.recognition?.stop();
+                await this.processSpeech(recognizedText || '');
             });
-
+    
+            // 先停止旧的语音识别，使用非阻塞方式
+            if (this.recognition) {
+                try {
+                    // 非阻塞的方式重置语音识别
+                    this.recognition.recognition.abort();
+                    this.recognition = new SpeechRecognition();
+                    // 重新设置必要的事件监听
+                    this.recognition.recognition.continuous = true;
+                    this.recognition.recognition.interimResults = true;
+                    this.recognition.recognition.lang = 'en-US';
+                } catch (e) {
+                    Logger.log('Recognition reset ignored:', e);
+                }
+            }
+    
+            try {
+                await this.recognition.start();
+            } catch (recognitionError) {
+                Logger.error('Recognition start error:', recognitionError);
+                if (!recognitionError.message.includes('already started')) {
+                    throw recognitionError;
+                }
+            }
+    
             const success = await this.audioService.startRecording();
             
             if (success) {
@@ -338,7 +398,7 @@ class PopupManager {
                     this.visualizer = new AudioVisualizer(visualizer);
                     this.visualizer.initialize(this.audioService.audioContext, this.audioService.source);
                 }
-
+    
                 this.setButtonState(startButton, 'success', '录音中');
                 startButton.disabled = true;
                 stopButton.disabled = false;
@@ -347,9 +407,14 @@ class PopupManager {
                 throw new Error('无法启动录音');
             }
         } catch (error) {
-            console.error('Start recording error:', error);
+            Logger.error('Start recording error:', error);
+            const errorMessage = error.name === 'NotAllowedError' ? 
+                '请允许麦克风访问权限' : 
+                (error.message || '启动录音失败');
+                    
             this.setButtonState(startButton, 'error', '启动失败');
-            this.showToast(error.message, 'error');
+            this.showToast(errorMessage, 'error');
+            
             setTimeout(() => {
                 this.setButtonState(startButton, 'default', '开始说话');
             }, 2000);
@@ -372,7 +437,7 @@ class PopupManager {
             
             // 按钮状态会在处理完成后在processSpeech中重置
         } catch (error) {
-            console.error('Stop recording error:', error);
+            Logger.error('Stop recording error:', error);
             this.setButtonState(stopButton, 'error', '停止失败');
             this.showToast(error.message, 'error');
             this.resetRecordingState();
@@ -395,49 +460,9 @@ class PopupManager {
         this.isProcessing = false;
     }
 
-    async startRecording() {
-        try {
-            const success = await this.audioService.startRecording();
-            if (!success) {
-                alert('Could not start recording. Please check your microphone permissions.');
-                return;
-            }
-
-            if (!this.visualizer) {
-                const visualizerElement = document.getElementById('visualizer');
-                if (visualizerElement) {
-                    this.visualizer = new AudioVisualizer(visualizerElement);
-                    this.visualizer.initialize(this.audioService.audioContext, this.audioService.source);
-                }
-            }
-
-            if (this.startRecordingBtn) this.startRecordingBtn.disabled = true;
-            if (this.stopRecordingBtn) this.stopRecordingBtn.disabled = false;
-        } catch (error) {
-            console.error('Failed to start recording:', error);
-            alert('Could not start recording. Please check your microphone permissions.');
-        }
-    }
-
-    async stopRecording() {
-        try {
-            const text = await this.recognition.stop();
-            const audioBlob = await this.audioService.stopRecording();
-            
-            if (this.startRecordingBtn) this.startRecordingBtn.disabled = false;
-            if (this.stopRecordingBtn) this.stopRecordingBtn.disabled = true;
-            
-            await this.processSpeech(text);
-        } catch (error) {
-            console.error('Failed to stop recording:', error);
-        }
-    }
-
     async processSpeech(text) {
         const loadingElement = document.getElementById('loading');
         const feedbackElement = document.getElementById('feedback');
-        const startButton = document.getElementById('start-recording');
-        const stopButton = document.getElementById('stop-recording');
         
         try {
             if (loadingElement) loadingElement.classList.remove('hidden');
@@ -456,11 +481,11 @@ class PopupManager {
                     const audio = await this.elevenlabsService.synthesizeSpeech(feedback.suggestions);
                     audio.play();
                 } catch (error) {
-                    console.error('Speech synthesis error:', error);
+                    Logger.error('Speech synthesis error:', error);
                 }
             }
         } catch (error) {
-            console.error('Process speech error:', error);
+            Logger.error('Process speech error:', error);
             this.showToast('处理语音时出错: ' + error.message, 'error');
         } finally {
             if (loadingElement) loadingElement.classList.add('hidden');
@@ -474,28 +499,54 @@ class PopupManager {
         const nextSuggestion = document.getElementById('next-suggestion');
         
         if (aiFeedback) {
-            aiFeedback.innerHTML = `
-                <div class="feedback-item">
-                    <strong>语法：</strong>
-                    <p>${feedback.grammar}</p>
-                </div>
-                <div class="feedback-item">
-                    <strong>表达：</strong>
-                    <p>${feedback.expression}</p>
-                </div>
-                <div class="feedback-item">
-                    <strong>发音：</strong>
-                    <p>${feedback.pronunciation}</p>
-                </div>
-                <div class="feedback-item">
-                    <strong>建议：</strong>
-                    <p>${feedback.suggestions}</p>
-                </div>
-            `;
+            // 创建反馈内容
+            const sections = [
+                {
+                    key: 'recognition',
+                    title: '识别语音',
+                    show: !!feedback.recognition
+                },
+                {
+                    key: 'grammar',
+                    title: '语法分析',
+                    show: !!feedback.grammar
+                },
+                {
+                    key: 'pronunciation',
+                    title: '发音指导',
+                    show: !!feedback.pronunciation
+                },
+                {
+                    key: 'suggestions',
+                    title: '建议',
+                    show: true  // 始终显示建议部分
+                }
+            ];
+    
+            aiFeedback.innerHTML = sections
+                .filter(section => section.show)
+                .map(section => {
+                    const content = feedback[section.key] || '';
+                    const formattedContent = content
+                        .split('\n')
+                        .map(line => line.trim())
+                        .filter(line => line)
+                        .map(line => `<p class="mt-1">${line}</p>`)
+                        .join('');
+    
+                    return `
+                        <div class="feedback-item">
+                            <strong>${section.title}：</strong>
+                            <div class="mt-2 text-gray-700">${formattedContent}</div>
+                        </div>
+                    `;
+                })
+                .join('<div class="my-2"></div>');  // 添加分隔
         }
         
+        // 更新下一句建议
         if (nextSuggestion) {
-            nextSuggestion.textContent = feedback.nextPrompt;
+            nextSuggestion.textContent = feedback.nextPrompt || '请继续说一句英语';
         }
     }
 }

@@ -1,15 +1,16 @@
-// src/services/audioService.js
+import { Logger } from '../utils/logger.js';
 
 export class AudioService {
     constructor() {
         this.stream = null;
-        this.mediaRecorder = null;
-        this.audioChunks = [];
         this.audioContext = null;
         this.source = null;
         this.isRecording = false;
-        this.recordingStoppedCallback = null;
+        this.workletNode = null;
+        this.webSocketService = null;
+        this.recordingStoppedCallback = null;  // 添加回调属性
     }
+
 
     async initialize() {
         try {
@@ -18,23 +19,30 @@ export class AudioService {
                     audio: {
                         echoCancellation: true,
                         noiseSuppression: true,
-                        sampleRate: 48000
+                        sampleRate: 16000
                     }
                 });
                 
                 this.stream = stream;
-                this.audioContext = new AudioContext();
+                this.audioContext = new AudioContext({sampleRate: 16000});
                 this.source = this.audioContext.createMediaStreamSource(this.stream);
+                
+                // 加载并创建 AudioWorklet
+                await this.audioContext.audioWorklet.addModule(chrome.runtime.getURL('src/utils/audio-processor.js'));
+                this.workletNode = new AudioWorkletNode(this.audioContext, 'audio-processor');
+                
+                // 设置消息处理
+                this.workletNode.port.onmessage = (event) => {
+                    if (event.data.type === 'audio-data' && this.isRecording && this.webSocketService?.isConnected) {
+                        this.webSocketService.sendAudioChunk(event.data.data);
+                    }
+                };
             }
             return true;
         } catch (error) {
-            console.error('Audio initialization failed:', error);
-            return false;
+            Logger.error('Audio initialization failed:', error);
+            throw error;
         }
-    }
-
-    setRecordingStoppedCallback(callback) {
-        this.recordingStoppedCallback = callback;
     }
 
     async startRecording() {
@@ -48,44 +56,44 @@ export class AudioService {
                 if (!initialized) return false;
             }
 
-            this.mediaRecorder = new MediaRecorder(this.stream);
-            this.audioChunks = [];
+            // 连接音频节点
+            this.source.connect(this.workletNode);
+            this.workletNode.connect(this.audioContext.destination);
             
-            this.mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    this.audioChunks.push(event.data);
-                }
-            };
-            
-            this.mediaRecorder.start();
             this.isRecording = true;
             return true;
         } catch (error) {
-            console.error('Failed to start recording:', error);
+            Logger.error('Failed to start recording:', error);
             return false;
         }
     }
 
+    
+    setRecordingStoppedCallback(callback) {
+        this.recordingStoppedCallback = callback;
+    }
+
     async stopRecording() {
-        if (!this.isRecording || !this.mediaRecorder) {
+        if (!this.isRecording) {
             return null;
         }
 
-        return new Promise((resolve) => {
-            this.mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-                this.isRecording = false;
-                this.audioChunks = [];
+        this.isRecording = false;
+        if (this.source && this.workletNode) {
+            this.source.disconnect(this.workletNode);
+            this.workletNode.disconnect();
+        }
 
-                if (this.recordingStoppedCallback) {
-                    await this.recordingStoppedCallback(audioBlob);
-                }
-                resolve(audioBlob);
-            };
+        // 调用停止回调
+        if (this.recordingStoppedCallback) {
+            await this.recordingStoppedCallback(null);
+        }
 
-            this.mediaRecorder.stop();
-            this.source?.disconnect();
-        });
+        return null;
+    }   
+
+    setWebSocketService(service) {
+        this.webSocketService = service;
     }
 
     cleanup() {
@@ -98,11 +106,9 @@ export class AudioService {
             this.audioContext.close();
             this.audioContext = null;
         }
-        if (this.source) {
-            this.source.disconnect();
-            this.source = null;
+        if (this.workletNode) {
+            this.workletNode.disconnect();
+            this.workletNode = null;
         }
-        this.mediaRecorder = null;
-        this.audioChunks = [];
     }
 }
