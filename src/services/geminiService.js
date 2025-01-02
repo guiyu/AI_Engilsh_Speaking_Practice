@@ -1,4 +1,5 @@
 // src/services/geminiService.js
+import { Logger } from '../utils/logger.js';
 
 export class GeminiService {
     constructor(apiKey) {
@@ -42,17 +43,17 @@ export class GeminiService {
                 }
             };
 
-            console.log('Sending initialization request:', JSON.stringify(initialMsg, null, 2));
+            Logger.log('Sending initialization request:', JSON.stringify(initialMsg, null, 2));
 
             const response = await this.makeRequest(
                 `${this.baseUrl}/${this.model}:generateContent?key=${this.apiKey}`,
                 initialMsg
             );
 
-            console.log('Received initialization response:', JSON.stringify(response, null, 2));
+            Logger.log('Received initialization response:', JSON.stringify(response, null, 2));
             return this.checkInitializationResponse(response);
         } catch (error) {
-            console.error('Initialization failed:', error);
+            Logger.error('Initialization failed:', error);
             throw error;
         }
     }
@@ -71,13 +72,13 @@ export class GeminiService {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error('API Error Response:', errorText);
+                Logger.error('API Error Response:', errorText);
                 throw new Error(errorText);
             }
 
             return await response.json();
         } catch (error) {
-            console.error('Request failed:', error);
+            Logger.error('Request failed:', error);
             throw error;
         }
     }
@@ -90,7 +91,7 @@ export class GeminiService {
 
         if (this.requestTimestamps.length >= this.MAX_REQUESTS_PER_MINUTE) {
             const waitTime = this.WINDOW_SIZE_MS - (now - this.requestTimestamps[0]);
-            console.log(`等待配额重置，${Math.ceil(waitTime/1000)}秒后重试...`);
+            Logger.log(`等待配额重置，${Math.ceil(waitTime/1000)}秒后重试...`);
             await new Promise(resolve => setTimeout(resolve, waitTime));
             return this.waitForQuota();
         }
@@ -106,17 +107,17 @@ export class GeminiService {
 
     checkInitializationResponse(response) {
         try {
-            console.log('Checking initialization response:', response);
+            Logger.log('Checking initialization response:', response);
             if (!response || !response.candidates || !response.candidates[0]) {
-                console.error('Invalid response format:', response);
+                Logger.error('Invalid response format:', response);
                 return false;
             }
 
             const text = response.candidates[0].content?.parts?.[0]?.text || '';
-            console.log('AI Response:', text);
+            Logger.log('AI Response:', text);
             return text.includes('OK');
         } catch (error) {
-            console.error('Error checking initialization response:', error);
+            Logger.error('Error checking initialization response:', error);
             return false;
         }
     }
@@ -148,14 +149,14 @@ export class GeminiService {
 
             return this.parseResponse(response);
         } catch (error) {
-            console.error('Process audio error:', error);
+            Logger.error('Process audio error:', error);
             throw error;
         }
     }
 
     parseResponse(response) {
         try {
-            console.log('Parsing response:', response); // 添加日志
+            Logger.log('Parsing response:', response); // 添加日志
     
             if (!response) {
                 throw new Error('Empty response');
@@ -164,7 +165,7 @@ export class GeminiService {
             // 处理 candidates 格式的响应
             if (response.candidates) {
                 const text = response.candidates[0]?.content?.parts?.[0]?.text || '';
-                console.log('Extracted text from candidates:', text);
+                Logger.log('Extracted text from candidates:', text);
                 return this.parseTextResponse(text);
             }
     
@@ -172,13 +173,13 @@ export class GeminiService {
             if (response.serverContent) {
                 const parts = response.serverContent.modelTurn?.parts || [];
                 const text = parts.map(part => part.text || '').join('\n');
-                console.log('Extracted text from serverContent:', text);
+                Logger.log('Extracted text from serverContent:', text);
                 return this.parseTextResponse(text);
             }
     
             throw new Error('Invalid response format');
         } catch (error) {
-            console.error('Parse response error:', error);
+            Logger.error('Parse response error:', error);
             return {
                 recognition: 'Error: 无法解析响应',
                 grammar: '无法分析',
@@ -220,7 +221,7 @@ export class GeminiService {
             const line = lines.find(l => l.includes(key));
             return line ? line.split('：')[1]?.trim() || '' : '';
         } catch (error) {
-            console.error(`Error extracting ${key}:`, error);
+            Logger.error(`Error extracting ${key}:`, error);
             return '';
         }
     }

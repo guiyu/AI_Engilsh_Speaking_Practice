@@ -1,6 +1,9 @@
+import { Logger } from '../utils/logger.js';
+
+
 export class WebSocketService {
     constructor(apiKey) {
-        console.log('WebSocketService initialized with key:', apiKey ? 'present' : 'missing');
+        Logger.log('WebSocketService initialized with key:', apiKey ? 'present' : 'missing');
         this.apiKey = apiKey;
         this.ws = null;
         this.host = "generativelanguage.googleapis.com";
@@ -11,19 +14,19 @@ export class WebSocketService {
 
     async connect() {
         const uri = `wss://${this.host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${this.apiKey}`;
-        console.log('Attempting to connect to:', uri);
+        Logger.log('Attempting to connect to:', uri);
 
         try {
             this.ws = new WebSocket(uri);
             
             this.ws.onopen = () => {
-                console.log('WebSocket connection opened');
+                Logger.log('WebSocket connection opened');
                 this.isConnected = true;
                 this.setupInitialPrompt();
             };
 
             this.ws.onmessage = async (event) => {
-                console.log('WebSocket received message:', event.data);
+                Logger.log('WebSocket received message:', event.data);
                 try {
                     let data;
                     if (event.data instanceof Blob) {
@@ -32,26 +35,26 @@ export class WebSocketService {
                     } else if (typeof event.data === 'string') {
                         data = JSON.parse(event.data);
                     }
-                    console.log('WebSocket received data:', data); // 添加日志
+                    Logger.log('WebSocket received data:', data); // 添加日志
                     if (this.onMessageCallback) {
                         this.onMessageCallback(data);
                     }
                 } catch (error) {
-                    console.error('Error parsing WebSocket message:', error, 'Raw data:', event.data);
+                    Logger.error('Error parsing WebSocket message:', error, 'Raw data:', event.data);
                 }
             };
 
             this.ws.onerror = (error) => {
-                console.error('WebSocket Error:', error);
+                Logger.error('WebSocket Error:', error);
                 this.isConnected = false;
             };
 
             this.ws.onclose = () => {
-                console.log('WebSocket closed:', event.code, event.reason);
+                Logger.log('WebSocket closed:', event.code, event.reason);
                 this.isConnected = false;
             };
         } catch (error) {
-            console.error('WebSocket connection failed:', error);
+            Logger.error('WebSocket connection failed:', error);
             throw error;
         }
     }
@@ -78,12 +81,12 @@ export class WebSocketService {
                 }
             }
         };
-        console.log('Sending setup message:', setupMsg); // 添加日志
+        Logger.log('Sending setup message:', setupMsg); // 添加日志
         await this.sendMessage(setupMsg);
     }
 
     async sendAudioChunk(audioData) {
-        console.log('Sending audio chunk, size:', audioData.byteLength);
+        Logger.log('Sending audio chunk, size:', audioData.byteLength);
 
         if (!this.isConnected) return;
 
@@ -98,7 +101,7 @@ export class WebSocketService {
             };
             await this.sendMessage(msg);
         } catch (error) {
-            console.error('Error sending audio chunk:', error);
+            Logger.error('Error sending audio chunk:', error);
         }
     }
 
@@ -108,7 +111,7 @@ export class WebSocketService {
                 const jsonString = JSON.stringify(msg);
                 this.ws.send(jsonString);
             } catch (error) {
-                console.error('Error sending message:', error);
+                Logger.error('Error sending message:', error);
                 throw error;
             }
         }

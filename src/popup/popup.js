@@ -7,6 +7,7 @@ import { StorageManager } from '../utils/storage.js';
 import { AudioVisualizer } from '../utils/audioVisualizer.js';
 import { SpeechRecognition } from '../utils/speechRecognition.js';
 import { WebSocketService } from '../services/websocketService.js'
+import { Logger } from '../utils/logger.js';
 
 class PopupManager {
     constructor() {
@@ -49,7 +50,7 @@ class PopupManager {
         
         // 验证必要的DOM元素存在
         if (!this.setupView || !this.practiceView) {
-            console.error('Required DOM elements not found');
+            Logger.error('Required DOM elements not found');
             return;
         }
     }
@@ -92,7 +93,7 @@ class PopupManager {
                 return false;
             }
         } catch (error) {
-            console.error('Permission check failed:', error);
+            Logger.error('Permission check failed:', error);
             if (statusIcon) statusIcon.textContent = '❌';
             if (statusText) statusText.textContent = '检查失败';
             return false;
@@ -141,9 +142,9 @@ class PopupManager {
                 });
                 await wsService.connect();
                 this.audioService.setWebSocketService(wsService);
-                console.log('Services created successfully');
+                Logger.info('Services created successfully');
             } catch (error) {
-                console.error('Failed to create services:', error);
+                Logger.error('Failed to create services:', error);
                 throw new Error('服务创建失败');
             }
         }
@@ -155,10 +156,10 @@ class PopupManager {
 
     handleWebSocketResponse(response) {
         try {
-            console.log('Handling WebSocket response:', response); // 添加日志
+            Logger.info('Handling WebSocket response:', response); // 添加日志
             
             if (!response) {
-                console.error('Empty response received');
+                Logger.error('Empty response received');
                 return;
             }
     
@@ -167,7 +168,7 @@ class PopupManager {
                 this.displayFeedback(feedback);
             }
         } catch (error) {
-            console.error('处理WebSocket响应错误:', error);
+            Logger.error('处理WebSocket响应错误:', error);
             this.showToast('处理响应时出错，请重试');
         }
     }
@@ -180,7 +181,7 @@ class PopupManager {
                 stream.getTracks().forEach(track => track.stop());
                 await this.checkMicrophonePermission();
             } catch (error) {
-                console.error('Microphone permission request failed:', error);
+                Logger.error('Microphone permission request failed:', error);
             }
         });
 
@@ -208,18 +209,18 @@ class PopupManager {
                 throw new Error('Gemini服务未正确初始化');
             }
     
-            console.log('Starting AI service initialization...');
+            Logger.log('Starting AI service initialization...');
             const initialized = await this.geminiService.initializeChat();
-            console.log('AI service initialization result:', initialized);
+            Logger.info('AI service initialization result:', initialized);
     
             if (!initialized) {
-                console.error('AI service initialization returned false');
+                Logger.error('AI service initialization returned false');
                 return false;
             }
     
             return true;
         } catch (error) {
-            console.error('AI service initialization error:', error);
+            Logger.error('AI service initialization error:', error);
             throw error;
         }
     }
@@ -233,7 +234,7 @@ class PopupManager {
                 alert('Please allow microphone access in your browser settings and try again.');
             }
         } catch (error) {
-            console.error('Mic permission error:', error);
+            Logger.error('Mic permission error:', error);
             alert('Microphone access is required for this app to work.');
         }
     }
@@ -328,7 +329,7 @@ class PopupManager {
                 }
             }
         } catch (error) {
-            console.error('Save setup error:', error);
+            Logger.error('Save setup error:', error);
             this.setButtonState(saveButton, 'error', '保存失败');
             this.showToast(error.message, 'error');
             setTimeout(() => {
@@ -377,14 +378,14 @@ class PopupManager {
                     this.recognition.recognition.interimResults = true;
                     this.recognition.recognition.lang = 'en-US';
                 } catch (e) {
-                    console.log('Recognition reset ignored:', e);
+                    Logger.log('Recognition reset ignored:', e);
                 }
             }
     
             try {
                 await this.recognition.start();
             } catch (recognitionError) {
-                console.error('Recognition start error:', recognitionError);
+                Logger.error('Recognition start error:', recognitionError);
                 if (!recognitionError.message.includes('already started')) {
                     throw recognitionError;
                 }
@@ -406,7 +407,7 @@ class PopupManager {
                 throw new Error('无法启动录音');
             }
         } catch (error) {
-            console.error('Start recording error:', error);
+            Logger.error('Start recording error:', error);
             const errorMessage = error.name === 'NotAllowedError' ? 
                 '请允许麦克风访问权限' : 
                 (error.message || '启动录音失败');
@@ -436,7 +437,7 @@ class PopupManager {
             
             // 按钮状态会在处理完成后在processSpeech中重置
         } catch (error) {
-            console.error('Stop recording error:', error);
+            Logger.error('Stop recording error:', error);
             this.setButtonState(stopButton, 'error', '停止失败');
             this.showToast(error.message, 'error');
             this.resetRecordingState();
@@ -480,11 +481,11 @@ class PopupManager {
                     const audio = await this.elevenlabsService.synthesizeSpeech(feedback.suggestions);
                     audio.play();
                 } catch (error) {
-                    console.error('Speech synthesis error:', error);
+                    Logger.error('Speech synthesis error:', error);
                 }
             }
         } catch (error) {
-            console.error('Process speech error:', error);
+            Logger.error('Process speech error:', error);
             this.showToast('处理语音时出错: ' + error.message, 'error');
         } finally {
             if (loadingElement) loadingElement.classList.add('hidden');

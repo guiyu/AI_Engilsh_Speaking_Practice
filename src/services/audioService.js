@@ -1,3 +1,5 @@
+import { Logger } from '../utils/logger.js';
+
 export class AudioService {
     constructor() {
         this.stream = null;
@@ -38,7 +40,7 @@ export class AudioService {
             }
             return true;
         } catch (error) {
-            console.error('Audio initialization failed:', error);
+            Logger.error('Audio initialization failed:', error);
             throw error;
         }
     }
@@ -61,7 +63,7 @@ export class AudioService {
             this.isRecording = true;
             return true;
         } catch (error) {
-            console.error('Failed to start recording:', error);
+            Logger.error('Failed to start recording:', error);
             return false;
         }
     }
