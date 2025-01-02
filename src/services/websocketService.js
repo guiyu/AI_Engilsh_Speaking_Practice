@@ -70,7 +70,7 @@ export class WebSocketService {
                     maxOutputTokens: 1024,
                     response_modalities: ["TEXT"]
                 },
-                user_prompt: {
+                prompt: {
                     text: `你是一名专业的英语口语指导老师。请对用户的发音提供以下分析：
     1. 语音识别：(准确识别的句子)
     2. 语法分析：(分析语法结构是否正确)

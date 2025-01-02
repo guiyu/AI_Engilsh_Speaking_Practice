@@ -156,37 +156,25 @@ export class GeminiService {
 
     parseResponse(response) {
         try {
-            Logger.log('Parsing response:', response); // 添加日志
-    
-            if (!response) {
-                throw new Error('Empty response');
+            Logger.log('Parsing response:', response);
+            if (!response.candidates || !response.candidates[0]) {
+                throw new Error('Invalid response format');
             }
     
-            // 处理 candidates 格式的响应
-            if (response.candidates) {
-                const text = response.candidates[0]?.content?.parts?.[0]?.text || '';
-                Logger.log('Extracted text from candidates:', text);
-                return this.parseTextResponse(text);
-            }
+            const text = response.candidates[0].content?.parts?.[0]?.text || '';
+            Logger.log('Full AI response:', text);
     
-            // 处理 serverContent 格式的响应
-            if (response.serverContent) {
-                const parts = response.serverContent.modelTurn?.parts || [];
-                const text = parts.map(part => part.text || '').join('\n');
-                Logger.log('Extracted text from serverContent:', text);
-                return this.parseTextResponse(text);
-            }
-    
-            throw new Error('Invalid response format');
+            // 如果是直接文本返回，保持完整显示
+            return {
+                recognition: text,  // 将完整文本放在 recognition 字段
+                grammar: '',        // 其他字段留空
+                pronunciation: '',
+                suggestions: text,  // suggestions 也放完整文本用于 TTS
+                nextPrompt: ''
+            };
         } catch (error) {
             Logger.error('Parse response error:', error);
-            return {
-                recognition: 'Error: 无法解析响应',
-                grammar: '无法分析',
-                pronunciation: '无法分析',
-                suggestions: '请重试',
-                nextPrompt: '请说一个新的句子'
-            };
+            throw error;
         }
     }
 
