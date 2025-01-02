@@ -26,15 +26,18 @@ export class GeminiService {
             }
 
             const initialMsg = {
-                contents: [
-                    {
-                        parts: [
-                            {
-                                text: "你是一名专业的英语口语指导老师，你需要帮助用户纠正语法发音，用户将会说一句英文，然后你会给出识别出来的英语是什么，并且告诉他发音中有什么问题，语法有什么错误，并且一步一步的纠正他的发音，当一次发音正确后，根据当前语句提出下一个场景的语句,然后一直循环这个过程，直到用户说OK，我要退出。你的回答永远要保持中文。如果明白了请回答OK两个字"
-                            }
-                        ]
-                    }
-                ],
+                contents: [{
+                    parts: [{
+                        text: `你是一名专业的英语口语指导老师，你需要帮助用户纠正语法发音，用户将会说一句英文，然后你会给出识别出来的英语是什么，并且告诉他发音中有什么问题，语法有什么错误，并且一步一步的纠正他的发音，当一次发音正确后，根据当前语句提出下一个场景的语句,然后一直循环这个过程。你的回答永远要保持中文：
+    1. 语音识别：<用户说的原文>
+    2. 语法分析：<分析句子语法正确性和结构>
+    3. 发音指导：<分析关键音素，重音和语调>
+    4. 实用建议：<2-3个类似场景的标准回答>
+    5. 下一句：<根据当前主题建议练习的下一句>
+    
+    请严格按照此格式回复，每个部分另起一行，仅在每个部分后提供对应的内容。如果明白了请回答OK。`
+                    }]
+                }],
                 generationConfig: {
                     temperature: 0.7,
                     topK: 40,
@@ -164,14 +167,58 @@ export class GeminiService {
             const text = response.candidates[0].content?.parts?.[0]?.text || '';
             Logger.log('Full AI response:', text);
     
-            // 如果是直接文本返回，保持完整显示
-            return {
-                recognition: text,  // 将完整文本放在 recognition 字段
-                grammar: '',        // 其他字段留空
+            // 提取用户的原始输入
+            let recognition = '';
+            const matchRecognition = text.match(/用户说[：:]\s*[""](.+?)[""]/) || 
+                                   text.match(/识别[：:]\s*[""](.+?)[""]/);
+            if (matchRecognition) {
+                recognition = matchRecognition[1];
+            }
+    
+            // 把Markdown格式的列表项转换为正常文本
+            const cleanText = text.replace(/\*\*/g, '')  // 移除加粗标记
+                                 .replace(/\* /g, '')    // 移除列表标记
+                                 .split('\n')            // 按行分割
+                                 .map(line => line.trim())
+                                 .filter(line => line);  // 移除空行
+    
+            // 构建返回对象
+            const result = {
+                recognition: recognition,
+                grammar: '',
                 pronunciation: '',
-                suggestions: text,  // suggestions 也放完整文本用于 TTS
+                suggestions: '',
                 nextPrompt: ''
             };
+    
+            // 尝试提取各部分内容
+            let currentSection = '';
+            for (const line of cleanText) {
+                // 根据关键词识别段落类型
+                if (line.includes('语法') || line.includes('句子结构')) {
+                    currentSection = 'grammar';
+                    continue;
+                } else if (line.includes('发音') || line.includes('音素')) {
+                    currentSection = 'pronunciation';
+                    continue;
+                } else if (line.includes('建议') || line.includes('改进')) {
+                    currentSection = 'suggestions';
+                    continue;
+                }
+    
+                // 累加当前段落的内容
+                if (currentSection && result[currentSection] !== undefined) {
+                    result[currentSection] += (result[currentSection] ? '\n' : '') + line;
+                }
+            }
+    
+            // 如果没有结构化解析出内容，就把完整回复放到suggestions中
+            if (!result.grammar && !result.pronunciation && !result.suggestions) {
+                result.suggestions = cleanText.join('\n');
+            }
+    
+            Logger.log('Parsed result:', result);
+            return result;
         } catch (error) {
             Logger.error('Parse response error:', error);
             throw error;

@@ -499,28 +499,54 @@ class PopupManager {
         const nextSuggestion = document.getElementById('next-suggestion');
         
         if (aiFeedback) {
-            aiFeedback.innerHTML = `
-                <div class="feedback-item">
-                    <strong>语法：</strong>
-                    <p>${feedback.grammar}</p>
-                </div>
-                <div class="feedback-item">
-                    <strong>表达：</strong>
-                    <p>${feedback.expression}</p>
-                </div>
-                <div class="feedback-item">
-                    <strong>发音：</strong>
-                    <p>${feedback.pronunciation}</p>
-                </div>
-                <div class="feedback-item">
-                    <strong>建议：</strong>
-                    <p>${feedback.suggestions}</p>
-                </div>
-            `;
+            // 创建反馈内容
+            const sections = [
+                {
+                    key: 'recognition',
+                    title: '识别语音',
+                    show: !!feedback.recognition
+                },
+                {
+                    key: 'grammar',
+                    title: '语法分析',
+                    show: !!feedback.grammar
+                },
+                {
+                    key: 'pronunciation',
+                    title: '发音指导',
+                    show: !!feedback.pronunciation
+                },
+                {
+                    key: 'suggestions',
+                    title: '建议',
+                    show: true  // 始终显示建议部分
+                }
+            ];
+    
+            aiFeedback.innerHTML = sections
+                .filter(section => section.show)
+                .map(section => {
+                    const content = feedback[section.key] || '';
+                    const formattedContent = content
+                        .split('\n')
+                        .map(line => line.trim())
+                        .filter(line => line)
+                        .map(line => `<p class="mt-1">${line}</p>`)
+                        .join('');
+    
+                    return `
+                        <div class="feedback-item">
+                            <strong>${section.title}：</strong>
+                            <div class="mt-2 text-gray-700">${formattedContent}</div>
+                        </div>
+                    `;
+                })
+                .join('<div class="my-2"></div>');  // 添加分隔
         }
         
+        // 更新下一句建议
         if (nextSuggestion) {
-            nextSuggestion.textContent = feedback.nextPrompt;
+            nextSuggestion.textContent = feedback.nextPrompt || '请继续说一句英语';
         }
     }
 }
