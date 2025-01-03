@@ -23,6 +23,8 @@ class PopupManager {
         this.setupView = null;
         this.practiceView = null;
         this.isProcessing = false;
+        this.isRecordingStarting = false; // 添加状态锁
+        this.currentAudio = null; // 添加属性跟踪当前播放的音频
 
         this.recognition.onresult = (event) => {
             const transcript = Array.from(event.results)
@@ -339,13 +341,37 @@ class PopupManager {
     }
 
     async handleStartRecording() {
+                    
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
+            this.currentAudio = null;
+        }
+
+        if (this.isRecordingStarting) {
+            this.isRecordingStarting = false;
+            return; // 如果正在启动录音，直接返回
+        }
+        
         const startButton = document.getElementById('start-recording');
         const stopButton = document.getElementById('stop-recording');
         const visualizer = document.getElementById('visualizer');
+        
     
         try {
             Logger.log('Starting recording process...');
-            
+            this.isRecordingStarting = true; // 设置状态锁
+
+
+
+            // 清理之前的录音实例
+            if (this.audioService) {
+                await this.audioService.cleanup();
+            }
+
+            // 重新创建 AudioService 实例
+             this.audioService = new AudioService();
+
             // 首先检查权限
             const hasPermission = await this.checkMicrophonePermission();
             if (!hasPermission) {
@@ -445,6 +471,18 @@ class PopupManager {
         }
     }
 
+    async cleanup() {
+        if (this.audioService) {
+            await this.audioService.cleanup();
+        }
+        if (this.recognition) {
+            this.recognition.recognition.abort();
+        }
+        if (this.visualizer) {
+            this.visualizer.stop();
+        }
+    }
+
     resetRecordingState() {
         const startButton = document.getElementById('start-recording');
         const stopButton = document.getElementById('stop-recording');
@@ -479,7 +517,13 @@ class PopupManager {
             
             if (this.elevenlabsService && feedback.suggestions) {
                 try {
+                    // 修改这部分代码
+                    if (this.currentAudio) {
+                        this.currentAudio.pause();
+                        this.currentAudio.currentTime = 0;
+                    }
                     const audio = await this.elevenlabsService.synthesizeSpeech(feedback.suggestions);
+                    this.currentAudio = audio;
                     audio.play();
                 } catch (error) {
                     Logger.error('Speech synthesis error:', error);

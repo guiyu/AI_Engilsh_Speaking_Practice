@@ -28,7 +28,15 @@ export class ElevenlabsService {
             }
 
             const audioBlob = await response.blob();
-            return new Audio(URL.createObjectURL(audioBlob));
+            const audio = new Audio(URL.createObjectURL(audioBlob));
+            
+            // 添加音频结束时的清理
+            audio.onended = () => {
+                URL.revokeObjectURL(audio.src); // 清理 Blob URL
+            };
+            
+            return audio;
+            
         } catch (error) {
             console.error('ElevenLabs API error:', error);
             throw new Error('Failed to generate speech');

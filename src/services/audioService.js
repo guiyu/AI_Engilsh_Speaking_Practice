@@ -123,17 +123,28 @@ export class AudioService {
 
     cleanup() {
         this.isRecording = false;
-        if (this.stream) {
-            this.stream.getTracks().forEach(track => track.stop());
-            this.stream = null;
-        }
-        if (this.audioContext) {
-            this.audioContext.close();
-            this.audioContext = null;
-        }
-        if (this.workletNode) {
-            this.workletNode.disconnect();
-            this.workletNode = null;
-        }
+        return new Promise(async (resolve) => {
+            try {
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                    this.stream = null;
+                }
+                if (this.audioContext) {
+                    await this.audioContext.close();
+                    this.audioContext = null;
+                }
+                if (this.workletNode) {
+                    this.workletNode.disconnect();
+                    this.workletNode = null;
+                }
+                if (this.source) {
+                    this.source.disconnect();
+                    this.source = null;
+                }
+            } catch (error) {
+                console.error('Error during cleanup:', error);
+            }
+            resolve();
+        });
     }
 }
