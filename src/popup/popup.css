@@ -81,6 +81,10 @@ input {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn.primary {
@@ -93,8 +97,19 @@ input {
 }
 
 .btn.secondary {
-    background: var(--secondary);
-    color: white;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.btn.secondary:hover {
+    background: var(--background);
+}
+
+/* 检查麦克风按钮样式 */
+#check-mic {
+    margin: 12px 0;
+    width: auto;
 }
 
 .btn:disabled {
@@ -305,4 +320,45 @@ input {
 #save-setup.saving::after {
     right: 10px;
     margin: -10px 0 0 0;
+}
+
+/* 添加到文件末尾 */
+.divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+}
+
+.feedback-section {
+    margin-top: 16px;
+}
+
+.feedback-section h3 {
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+/* 修改反馈按钮样式 */
+#feedback-btn {
+    width: 100%;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 10px;
+    margin: 8px 0;
+}
+
+#feedback-btn:hover {
+    background: var(--background);
+}
+
+/* 保存按钮样式 */
+#save-setup {
+    margin-top: 24px;
+    width: 100%;
+}
+
+.feedback-icon {
+    font-size: 16px;
 }
