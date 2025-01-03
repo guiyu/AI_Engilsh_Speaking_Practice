@@ -344,6 +344,8 @@ class PopupManager {
         const visualizer = document.getElementById('visualizer');
     
         try {
+            Logger.log('Starting recording process...');
+            
             // 首先检查权限
             const hasPermission = await this.checkMicrophonePermission();
             if (!hasPermission) {
@@ -352,52 +354,51 @@ class PopupManager {
     
             this.setButtonState(startButton, 'loading', '准备录音...');
     
-            // 确保 AudioService 已正确初始化
-            if (!this.audioService) {
-                this.audioService = new AudioService();
-                await this.audioService.initialize();
+            // 确保创建新的 AudioService 实例
+            this.audioService = new AudioService();
+            const initialized = await this.audioService.initialize();
+            if (!initialized) {
+                throw new Error('无法初始化音频服务');
             }
+    
+            Logger.log('Audio service initialized');
     
             // 设置录音停止回调
             this.audioService.setRecordingStoppedCallback(async () => {
                 if (this.visualizer) {
                     this.visualizer.stop();
+                    this.visualizer = null; // 清理可视化器
                 }
                 const recognizedText = await this.recognition?.stop();
                 await this.processSpeech(recognizedText || '');
             });
     
-            // 先停止旧的语音识别，使用非阻塞方式
+            // 重置语音识别
             if (this.recognition) {
                 try {
-                    // 非阻塞的方式重置语音识别
                     this.recognition.recognition.abort();
                     this.recognition = new SpeechRecognition();
-                    // 重新设置必要的事件监听
                     this.recognition.recognition.continuous = true;
                     this.recognition.recognition.interimResults = true;
                     this.recognition.recognition.lang = 'en-US';
+                    Logger.log('Speech recognition reset');
                 } catch (e) {
                     Logger.log('Recognition reset ignored:', e);
                 }
             }
     
-            try {
-                await this.recognition.start();
-            } catch (recognitionError) {
-                Logger.error('Recognition start error:', recognitionError);
-                if (!recognitionError.message.includes('already started')) {
-                    throw recognitionError;
-                }
-            }
+            // 启动语音识别
+            await this.recognition.start();
+            Logger.log('Speech recognition started');
     
+            // 启动录音
             const success = await this.audioService.startRecording();
             
             if (success) {
-                if (!this.visualizer && visualizer) {
-                    this.visualizer = new AudioVisualizer(visualizer);
-                    this.visualizer.initialize(this.audioService.audioContext, this.audioService.source);
-                }
+                // 创建新的可视化器
+                this.visualizer = new AudioVisualizer(visualizer);
+                this.visualizer.initialize(this.audioService.audioContext, this.audioService.source);
+                Logger.log('Recording started successfully');
     
                 this.setButtonState(startButton, 'success', '录音中');
                 startButton.disabled = true;

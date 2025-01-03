@@ -77,20 +77,45 @@ export class AudioService {
         if (!this.isRecording) {
             return null;
         }
-
+    
+        Logger.log('Stopping recording...');
         this.isRecording = false;
-        if (this.source && this.workletNode) {
-            this.source.disconnect(this.workletNode);
-            this.workletNode.disconnect();
+    
+        try {
+            // 断开音频处理节点
+            if (this.source && this.workletNode) {
+                this.source.disconnect(this.workletNode);
+                this.workletNode.disconnect();
+            }
+    
+            // 清理音频上下文
+            if (this.audioContext) {
+                await this.audioContext.close();
+                this.audioContext = null;
+            }
+    
+            // 停止所有音频轨道
+            if (this.stream) {
+                this.stream.getTracks().forEach(track => track.stop());
+                this.stream = null;
+            }
+    
+            // 清除工作节点
+            this.workletNode = null;
+            this.source = null;
+    
+            // 调用停止回调
+            if (this.recordingStoppedCallback) {
+                await this.recordingStoppedCallback(null);
+            }
+    
+            Logger.log('Recording stopped successfully');
+            return null;
+        } catch (error) {
+            Logger.error('Error stopping recording:', error);
+            throw error;
         }
-
-        // 调用停止回调
-        if (this.recordingStoppedCallback) {
-            await this.recordingStoppedCallback(null);
-        }
-
-        return null;
-    }   
+    }
 
     setWebSocketService(service) {
         this.webSocketService = service;
