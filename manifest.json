@@ -7,6 +7,7 @@
     "storage",
     "activeTab",
     "scripting",
+    "tabs",
     "webNavigation"
   ],
   "host_permissions": [
@@ -17,7 +18,12 @@
     "type": "module"
   },
   "web_accessible_resources": [{
-    "resources": ["src/utils/audio-processor.js"],
+    "resources":  [
+      "src/pages/feedback/feedback.html",
+      "src/pages/feedback/feedback.css",
+      "src/pages/feedback/feedback.js",
+      "assets/icons/*"
+    ],
     "matches": ["<all_urls>"]
   }],
   "content_security_policy": {
