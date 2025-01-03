@@ -1,5 +1,6 @@
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
@@ -10,7 +11,8 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[name].bundle.js',
+    filename: '[name]/[name].bundle.js',
+    clean: true,
   },
   module: {
     rules: [
@@ -30,6 +32,17 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'manifest.json', to: 'manifest.json' },
+        { from: 'assets', to: 'assets' },
+        { from: 'src/popup/popup.html', to: 'popup/popup.html' },
+        { from: 'src/popup/popup.css', to: 'popup/popup.css' },
+        { from: 'src/pages', to: 'pages' },
+      ],
+    }),
+  ],
   optimization: {
     minimize: process.env.NODE_ENV === 'production',
     minimizer: [

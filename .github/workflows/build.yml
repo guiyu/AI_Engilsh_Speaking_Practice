@@ -33,11 +33,29 @@ jobs:
 
     - name: Prepare extension files
       run: |
-        mkdir -p dist
+        mkdir -p dist/popup
+        mkdir -p dist/background
+        mkdir -p dist/content
+        mkdir -p dist/pages/feedback
+        mkdir -p dist/pages/permission
+        mkdir -p dist/services
+        mkdir -p dist/utils
+        
+        # 复制必要文件
         cp manifest.json dist/
         cp -r assets dist/
+        
+        # 复制 HTML 和 CSS 文件
         cp src/popup/popup.html dist/popup/
         cp src/popup/popup.css dist/popup/
+        
+        # 复制其他必要的页面文件
+        cp src/pages/feedback/feedback.html dist/pages/feedback/
+        cp src/pages/feedback/feedback.css dist/pages/feedback/
+        cp src/pages/permission/index.html dist/pages/permission/
+
+        # 打印目录结构以便调试
+        tree dist/
 
     - name: Create ZIP archive
       run: |
