@@ -211,28 +211,34 @@ class PopupManager {
     }
 
     // 添加处理反馈的方法
-    handleFeedback() {
-        const subject = encodeURIComponent('AI English Speaking Practice 反馈');
-        const body = encodeURIComponent(
-            '请在此描述你遇到的问题或建议：\n\n' +
-            '-------------------\n' +
-            `版本：${chrome.runtime.getManifest().version}\n` +
-            `浏览器：${navigator.userAgent}\n` +
-            '-------------------\n'
-        );
+    // handleFeedback() {
+    //     const subject = encodeURIComponent('AI English Speaking Practice 反馈');
+    //     const body = encodeURIComponent(
+    //         '请在此描述你遇到的问题或建议：\n\n' +
+    //         '-------------------\n' +
+    //         `版本：${chrome.runtime.getManifest().version}\n` +
+    //         `浏览器：${navigator.userAgent}\n` +
+    //         '-------------------\n'
+    //     );
         
-        const mailtoLink = `mailto:weiyi415@gmail.com?subject=${subject}&body=${body}`;
+    //     const mailtoLink = `mailto:weiyi415@gmail.com?subject=${subject}&body=${body}`;
         
-        // 使用 chrome.tabs API 打开默认邮件客户端
-        chrome.tabs.create({ url: mailtoLink }, (tab) => {
-            // 3秒后关闭邮件标签页
-            setTimeout(() => {
-                chrome.tabs.remove(tab.id);
-            }, 3000);
-        });
+    //     // 使用 chrome.tabs API 打开默认邮件客户端
+    //     chrome.tabs.create({ url: mailtoLink }, (tab) => {
+    //         // 3秒后关闭邮件标签页
+    //         setTimeout(() => {
+    //             chrome.tabs.remove(tab.id);
+    //         }, 3000);
+    //     });
 
-        // 显示提示
-        this.showToast('已打开邮件客户端，请填写反馈内容');
+    //     // 显示提示
+    //     this.showToast('已打开邮件客户端，请填写反馈内容');
+    // }
+
+    handleFeedback() {
+        chrome.tabs.create({
+            url: chrome.runtime.getURL('src/pages/feedback/feedback.html')
+        });
     }
 
     async initializeAIServices() {

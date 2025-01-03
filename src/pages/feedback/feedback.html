@@ -1,0 +1,39 @@
+<!-- /src/pages/feedback/feedback.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>发送反馈</title>
+    <link rel="stylesheet" href="feedback.css">
+</head>
+<body>
+    <div class="container">
+        <h2>发送反馈</h2>
+        
+        <div class="email-services">
+            <h3>选择邮件服务</h3>
+            <div class="service-buttons">
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&tf=1&to=weiyi415@gmail.com&su=AI+English+Speaking+Practice+反馈" 
+                   target="_blank" 
+                   class="service-btn gmail">
+                    <img src="../../assets/icons/gmail.png" alt="Gmail">
+                    使用 Gmail 发送
+                </a>
+                
+                <a href="https://outlook.live.com/mail/0/deeplink/compose?to=weiyi415@gmail.com&subject=AI+English+Speaking+Practice+反馈" 
+                   target="_blank" 
+                   class="service-btn outlook">
+                    <img src="../../assets/icons/outlook.png" alt="Outlook">
+                    使用 Outlook 发送
+                </a>
+            </div>
+        </div>
+
+        <div class="debug-info">
+            <h3>调试信息</h3>
+            <pre id="debug-info"></pre>
+        </div>
+    </div>
+    <script src="feedback.js"></script>
+</body>
+</html>

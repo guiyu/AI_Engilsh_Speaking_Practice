@@ -18,7 +18,13 @@
     "type": "module"
   },
   "web_accessible_resources": [{
-    "resources": ["src/utils/audio-processor.js"],
+    "resources":  [
+      "src/pages/feedback/feedback.html",
+      "src/pages/feedback/feedback.css",
+      "src/pages/feedback/feedback.js",
+      "assets/icons/gmail.png",
+      "assets/icons/outlook.png"
+    ],
     "matches": ["<all_urls>"]
   }],
   "content_security_policy": {
