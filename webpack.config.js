@@ -33,7 +33,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new CopyWebpackPlugin({
+    new CopyWebpackPlugin({ 
       patterns: [
         { from: 'manifest.json', to: 'manifest.json' },
         { from: '_locales', to: '_locales' },  // 添加这一行
