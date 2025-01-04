@@ -366,7 +366,7 @@ input {
 /* 广告容器样式 */
 .ads-container {
     width: 100%;
-    height: 100px;
+    min-height: 100px; /* 改为 min-height 以适应自适应广告 */
     margin-bottom: 20px;
     background: var(--surface);
     border-radius: 8px;
