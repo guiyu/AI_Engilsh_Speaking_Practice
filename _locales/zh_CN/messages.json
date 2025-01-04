@@ -1,0 +1,83 @@
+{
+    "extensionName": {
+      "message": "AI英语口语练习"
+    },
+    "extensionDescription": {
+      "message": "使用实时AI反馈练习英语口语"
+    },
+    "settings": {
+      "message": "设置"
+    },
+    "micPermission": {
+      "message": "麦克风权限"
+    },
+    "unchecked": {
+      "message": "未检查"
+    },
+    "granted": {
+      "message": "已授权"
+    },
+    "denied": {
+      "message": "未授权"
+    },
+    "checkFailed": {
+      "message": "检查失败"
+    },
+    "checkMicPermission": {
+      "message": "检查麦克风权限"
+    },
+    "geminiKeyRequired": {
+      "message": "Google Gemini API Key (必需)"
+    },
+    "enterGeminiKey": {
+      "message": "输入 Gemini API Key"
+    },
+    "getGeminiKey": {
+      "message": "获取 Gemini API Key"
+    },
+    "elevenlabsKeyOptional": {
+      "message": "ElevenLabs API Key (可选语音功能)"
+    },
+    "enterElevenlabsKey": {
+      "message": "输入 ElevenLabs API Key"
+    },
+    "getElevenlabsKey": {
+      "message": "获取 ElevenLabs API Key"
+    },
+    "saveAndStart": {
+      "message": "保存并开始练习"
+    },
+    "feedback": {
+      "message": "反馈建议"
+    },
+    "sendFeedback": {
+      "message": "发送反馈"
+    },
+    "practiceTitle": {
+      "message": "英语口语练习"
+    },
+    "tryToSay": {
+      "message": "试着说一句英语，比如："
+    },
+    "startSpeaking": {
+      "message": "开始说话"
+    },
+    "stop": {
+      "message": "停止"
+    },
+    "processing": {
+      "message": "正在处理..."
+    },
+    "recognizedSpeech": {
+      "message": "识别到的语音："
+    },
+    "aiFeedback": {
+      "message": "AI 反馈："
+    },
+    "nextPractice": {
+      "message": "下一句练习："
+    },
+    "sponsored": {
+      "message": "赞助内容"
+    }
+  }

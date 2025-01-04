@@ -36,6 +36,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: 'manifest.json', to: 'manifest.json' },
+        { from: '_locales', to: '_locales' },  // 添加这一行
         { from: 'assets', to: 'assets' },
         { from: 'src/popup/popup.html', to: 'popup/popup.html' },
         { from: 'src/popup/popup.css', to: 'popup/popup.css' },

@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "AI English Speaking Practice",
+  "name": "__MSG_extensionName__",
   "version": "1.0",
-  "description": "Practice English speaking with real-time AI feedback",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "zh_CN",
   "permissions": [
     "storage",
     "activeTab",

@@ -1,0 +1,83 @@
+{
+    "extensionName": {
+      "message": "AI English Speaking Practice"
+    },
+    "extensionDescription": {
+      "message": "Practice English speaking with real-time AI feedback"
+    },
+    "settings": {
+      "message": "Settings"
+    },
+    "micPermission": {
+      "message": "Microphone Permission"
+    },
+    "unchecked": {
+      "message": "Unchecked"
+    },
+    "granted": {
+      "message": "Granted"
+    },
+    "denied": {
+      "message": "Denied"
+    },
+    "checkFailed": {
+      "message": "Check Failed"
+    },
+    "checkMicPermission": {
+      "message": "Check Microphone Permission"
+    },
+    "geminiKeyRequired": {
+      "message": "Google Gemini API Key (Required)"
+    },
+    "enterGeminiKey": {
+      "message": "Enter Gemini API Key"
+    },
+    "getGeminiKey": {
+      "message": "Get Gemini API Key"
+    },
+    "elevenlabsKeyOptional": {
+      "message": "ElevenLabs API Key (Optional for voice)"
+    },
+    "enterElevenlabsKey": {
+      "message": "Enter ElevenLabs API Key"
+    },
+    "getElevenlabsKey": {
+      "message": "Get ElevenLabs API Key"
+    },
+    "saveAndStart": {
+      "message": "Save and Start Practice"
+    },
+    "feedback": {
+      "message": "Feedback"
+    },
+    "sendFeedback": {
+      "message": "Send Feedback"
+    },
+    "practiceTitle": {
+      "message": "English Speaking Practice"
+    },
+    "tryToSay": {
+      "message": "Try to say something in English, like:"
+    },
+    "startSpeaking": {
+      "message": "Start Speaking"
+    },
+    "stop": {
+      "message": "Stop"
+    },
+    "processing": {
+      "message": "Processing..."
+    },
+    "recognizedSpeech": {
+      "message": "Recognized Speech:"
+    },
+    "aiFeedback": {
+      "message": "AI Feedback:"
+    },
+    "nextPractice": {
+      "message": "Next Practice:"
+    },
+    "sponsored": {
+      "message": "Sponsored"
+    }
+  }
