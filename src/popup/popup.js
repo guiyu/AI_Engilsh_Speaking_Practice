@@ -9,6 +9,7 @@ import { SpeechRecognition } from '../utils/speechRecognition.js';
 import { WebSocketService } from '../services/websocketService.js'
 import { Logger } from '../utils/logger.js';
 import { AdsService } from '../services/adsService.js';
+import { i18n } from '../utils/i18n.js';
 
 
 class PopupManager {
@@ -42,6 +43,11 @@ class PopupManager {
             this.initializeDOMElements();
             this.initializeUI();
             this.setupEventListeners();
+        });
+
+            // 初始化国际化
+        document.addEventListener('DOMContentLoaded', () => {
+            i18n.initializeI18n();
         });
     }
 
@@ -97,19 +103,19 @@ class PopupManager {
             
             if (permissionResult.state === 'granted') {
                 if (statusIcon) statusIcon.textContent = '✅';
-                if (statusText) statusText.textContent = '已授权';
+                if (statusText) statusText.textContent = i18n.getMessage('granted');
                 this.updateSaveButtonState();
                 return true;
             } else {
                 if (statusIcon) statusIcon.textContent = '⚠️';
-                if (statusText) statusText.textContent = '未授权';
+                if (statusText) statusText.textContent = i18n.getMessage('denied');
                 document.getElementById('check-mic')?.classList.remove('hidden');
                 return false;
             }
         } catch (error) {
             Logger.error('Permission check failed:', error);
             if (statusIcon) statusIcon.textContent = '❌';
-            if (statusText) statusText.textContent = '检查失败';
+            if (statusText) statusText.textContent = i18n.getMessage('checkFailed');
             return false;
         }
     }
@@ -131,7 +137,7 @@ class PopupManager {
         const micStatus = document.getElementById('mic-status')?.querySelector('.status-text')?.textContent;
     
         if (saveButton) {
-            saveButton.disabled = !(geminiKey && micStatus === '已授权');
+            saveButton.disabled = !(geminiKey && micStatus === i18n.getMessage('granted'));
         }
     }
 
@@ -347,25 +353,25 @@ class PopupManager {
             case 'loading':
                 button.classList.add('loading');
                 button.disabled = true;
-                if (message) button.textContent = message;
+                if (message) button.textContent = i18n.getMessage(message);
                 break;
             case 'success':
                 button.classList.add('success');
                 setTimeout(() => {
                     button.classList.remove('success');
                 }, 2000);
-                if (message) button.textContent = message;
+                if (message) button.textContent = i18n.getMessage(message);
                 break;
             case 'error':
                 button.classList.add('error');
                 setTimeout(() => {
                     button.classList.remove('error');
                 }, 2000);
-                if (message) button.textContent = message;
+                if (message) button.textContent = i18n.getMessage(message);
                 break;
             case 'default':
                 button.disabled = false;
-                if (message) button.textContent = message;
+                if (message) button.textContent = i18n.getMessage(message);
                 break;
         }
     }
@@ -376,7 +382,7 @@ class PopupManager {
         const elevenlabsKey = document.getElementById('elevenlabs-key')?.value;
     
         try {
-            this.setButtonState(saveButton, 'loading', '保存中...');
+            this.setButtonState(saveButton, 'loading', i18n.getMessage('saving'));
     
             if (geminiKey) {
                 await StorageManager.saveKeys(geminiKey, elevenlabsKey);
@@ -385,22 +391,22 @@ class PopupManager {
                 try {
                     const initResult = await this.initializeAIServices();
                     if (!initResult) {
-                        throw new Error('AI服务初始化失败');
+                        throw new Error('AI init Failed');
                     }
                     
-                    this.setButtonState(saveButton, 'success', '保存成功');
-                    this.showToast('设置已保存，正在切换到练习界面');
+                    this.setButtonState(saveButton, 'success', i18n.getMessage('saveSuccess'));
+                    this.showToast(i18n.getMessage('saveSuccess'));
                     setTimeout(() => this.showPracticeView(), 1500);
                 } catch (initError) {
-                    throw new Error('AI服务初始化失败: ' + initError.message);
+                    throw new Error('AI init Failed: ' + initError.message);
                 }
             }
         } catch (error) {
             Logger.error('Save setup error:', error);
-            this.setButtonState(saveButton, 'error', '保存失败');
+            this.setButtonState(saveButton, 'error', i18n.getMessage('savesaveFailedSuccess'));
             this.showToast(error.message, 'error');
             setTimeout(() => {
-                this.setButtonState(saveButton, 'default', '保存并开始练习');
+                this.setButtonState(saveButton, 'default',i18n.getMessage('saveAndStart'));
             }, 2000);
         }
     }
@@ -440,16 +446,16 @@ class PopupManager {
             // 首先检查权限
             const hasPermission = await this.checkMicrophonePermission();
             if (!hasPermission) {
-                throw new Error('需要麦克风访问权限');
+                throw new Error(i18n.getMessage('micPermissionRequired'));
             }
     
-            this.setButtonState(startButton, 'loading', '准备录音...');
+            this.setButtonState(startButton, 'loading', i18n.getMessage('preparingRecording'));
     
             // 确保创建新的 AudioService 实例
             this.audioService = new AudioService();
             const initialized = await this.audioService.initialize();
             if (!initialized) {
-                throw new Error('无法初始化音频服务');
+                throw new Error(i18n.getMessage('audioInitializationFailed'));
             }
     
             Logger.log('Audio service initialized');
@@ -491,24 +497,24 @@ class PopupManager {
                 this.visualizer.initialize(this.audioService.audioContext, this.audioService.source);
                 Logger.log('Recording started successfully');
     
-                this.setButtonState(startButton, 'success', '录音中');
+                this.setButtonState(startButton, 'success', i18n.getMessage('preparingRecording'));
                 startButton.disabled = true;
                 stopButton.disabled = false;
-                this.showToast('录音已开始');
+                this.showToast(i18n.getMessage('recordingStarted'));
             } else {
-                throw new Error('无法启动录音');
+                throw new Error(i18n.getMessage('errorStartingRecording'));
             }
         } catch (error) {
             Logger.error('Start recording error:', error);
             const errorMessage = error.name === 'NotAllowedError' ? 
-                '请允许麦克风访问权限' : 
-                (error.message || '启动录音失败');
+                i18n.getMessage('micPermissionRequired') : 
+                (error.message || i18n.getMessage('errorStartingRecording'));
                     
-            this.setButtonState(startButton, 'error', '启动失败');
+            this.setButtonState(startButton, 'error', i18n.getMessage('errorStartingRecording'));
             this.showToast(errorMessage, 'error');
             
             setTimeout(() => {
-                this.setButtonState(startButton, 'default', '开始说话');
+                this.setButtonState(startButton, 'default', i18n.getMessage('startSpeaking'));
             }, 2000);
         }
     }
@@ -521,16 +527,16 @@ class PopupManager {
 
         try {
             this.isProcessing = true;
-            this.setButtonState(stopButton, 'loading', '停止中...');
+            this.setButtonState(stopButton, 'loading', i18n.getMessage('stoppingRecording'));
             
             await this.audioService.stopRecording();
             
-            this.setButtonState(stopButton, 'success', '已停止');
+            this.setButtonState(stopButton, 'success', i18n.getMessage('recordingStopped'));
             
             // 按钮状态会在处理完成后在processSpeech中重置
         } catch (error) {
             Logger.error('Stop recording error:', error);
-            this.setButtonState(stopButton, 'error', '停止失败');
+            this.setButtonState(stopButton, 'error', i18n.getMessage('errorStoppingRecording'));
             this.showToast(error.message, 'error');
             this.resetRecordingState();
         }
@@ -554,11 +560,11 @@ class PopupManager {
 
         if (startButton) {
             startButton.disabled = false;
-            this.setButtonState(startButton, 'default', '开始说话');
+            this.setButtonState(startButton, 'default', i18n.getMessage('startSpeaking'));
         }
         if (stopButton) {
             stopButton.disabled = true;
-            this.setButtonState(stopButton, 'default', '停止');
+            this.setButtonState(stopButton, 'default', i18n.getMessage('stop'));
         }
 
         this.isProcessing = false;
@@ -574,7 +580,7 @@ class PopupManager {
             
             const recognizedTextElement = document.getElementById('recognized-text');
             if (recognizedTextElement) {
-                recognizedTextElement.textContent = text || '处理中...';
+                recognizedTextElement.textContent = text || i18n.getMessage('processing');
             }
             
             const feedback = await this.geminiService.processAudio(text);
@@ -596,7 +602,7 @@ class PopupManager {
             }
         } catch (error) {
             Logger.error('Process speech error:', error);
-            this.showToast('处理语音时出错: ' + error.message, 'error');
+            this.showToast(i18n.getMessage('speechProcessingError') + error.message, 'error');
         } finally {
             if (loadingElement) loadingElement.classList.add('hidden');
             if (feedbackElement) feedbackElement.classList.remove('hidden');
@@ -613,23 +619,23 @@ class PopupManager {
             const sections = [
                 {
                     key: 'recognition',
-                    title: '识别语音',
+                    title: i18n.getMessage('feedbackRecognition'),
                     show: !!feedback.recognition
                 },
                 {
                     key: 'grammar',
-                    title: '语法分析',
+                    title: i18n.getMessage('feedbackGrammar'),
                     show: !!feedback.grammar
                 },
                 {
                     key: 'pronunciation',
-                    title: '发音指导',
+                    title: i18n.getMessage('feedbackPronunciation'),
                     show: !!feedback.pronunciation
                 },
                 {
                     key: 'suggestions',
-                    title: '建议',
-                    show: true  // 始终显示建议部分
+                    title: i18n.getMessage('feedbackSuggestions'),
+                    show: true  // Always show suggestions section
                 }
             ];
     
@@ -656,7 +662,7 @@ class PopupManager {
         
         // 更新下一句建议
         if (nextSuggestion) {
-            nextSuggestion.textContent = feedback.nextPrompt || '请继续说一句英语';
+            nextSuggestion.textContent = feedback.nextPrompt || i18n.getMessage('continueSpeak');
         }
     }
 }

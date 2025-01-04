@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>AI English Practice</title>
+    <title data-i18n="extensionName">AI English Practice</title>
     <link href="popup.css" rel="stylesheet">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1439163298200762" crossorigin="anonymous"></script>
     <meta name="google-adsense-account" content="ca-pub-1439163298200762">
@@ -11,62 +11,60 @@
     <div class="container">
         <!-- 权限检查和API设置视图 -->
         <div id="setup-view" class="view">
-            <h2>设置</h2>
+            <h2 data-i18n="settings">设置</h2>
             <div class="setup-content">
                 <!-- 麦克风权限检查 -->
                 <div class="permission-section">
-                    <h3>麦克风权限</h3>
+                    <h3 data-i18n="micPermission">麦克风权限</h3>
                     <div id="mic-status" class="status-indicator">
                         <span class="status-icon">⚪</span>
-                        <span class="status-text">未检查</span>
+                        <span class="status-text" data-i18n="unchecked">未检查</span>
                     </div>
                     <button id="check-mic" class="btn secondary">
                         <span class="icon">🎤</span>
-                        检查麦克风权限
+                        <span data-i18n="checkMicPermission">检查麦克风权限</span>
                     </button>
                 </div>
 
                 <!-- API密钥设置 -->
                 <div class="api-section">
                     <div class="form-group">
-                        <label for="gemini-key">Google Gemini API Key (必需)</label>
-                        <input type="password" id="gemini-key" placeholder="输入 Gemini API Key" required>
+                        <label for="gemini-key" data-i18n="geminiKeyRequired">Google Gemini API Key (必需)</label>
+                        <input type="password" id="gemini-key" data-i18n="enterGeminiKey" placeholder="输入 Gemini API Key" required>
                         <div class="hint">
-                            <a href="https://aistudio.google.com/app/apikey" target="_blank">获取 Gemini API Key</a>
+                            <a href="https://aistudio.google.com/app/apikey" target="_blank" data-i18n="getGeminiKey">获取 Gemini API Key</a>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="elevenlabs-key">ElevenLabs API Key (可选语音功能)</label>
-                        <input type="password" id="elevenlabs-key" placeholder="输入 ElevenLabs API Key">
+                        <label for="elevenlabs-key" data-i18n="elevenlabsKeyOptional">ElevenLabs API Key (可选语音功能)</label>
+                        <input type="password" id="elevenlabs-key" data-i18n="enterElevenlabsKey" placeholder="输入 ElevenLabs API Key">
                         <div class="hint">
-                            <a href="https://elevenlabs.io" target="_blank">获取 ElevenLabs API Key</a>
+                            <a href="https://elevenlabs.io" target="_blank" data-i18n="getElevenlabsKey">获取 ElevenLabs API Key</a>
                         </div>
                     </div>
 
-                    
                     <button id="save-setup" class="btn primary" disabled>
                         <span class="icon">💾</span>
-                        保存并开始练习
+                        <span data-i18n="saveAndStart">保存并开始练习</span>
                     </button>
 
-                        <!-- 添加分隔线和反馈部分 -->
+                    <!-- 反馈部分 -->
                     <div class="divider"></div>
                     <div class="feedback-section">
-                        <h3>反馈建议</h3>
+                        <h3 data-i18n="feedback">反馈建议</h3>
                         <button id="feedback-btn" class="btn secondary">
                             <span class="feedback-icon">💡</span>
-                            发送反馈
+                            <span data-i18n="sendFeedback">发送反馈</span>
                         </button>
                     </div>
                 </div>
-
             </div>
         </div>
 
         <!-- 练习视图 -->
         <div id="practice-view" class="view hidden">
-            <!-- 添加广告容器到顶部 -->
+            <!-- 广告容器 -->
             <div class="ads-container">
                 <ins class="adsbygoogle"
                      style="display:block"
@@ -79,43 +77,46 @@
                 </script>
             </div>
             <div class="practice-header">
-                <h2>英语口语练习</h2>
-                <button id="settings" class="btn secondary small">设置</button>
+                <h2 data-i18n="practiceTitle">英语口语练习</h2>
+                <button id="settings" class="btn secondary small" data-i18n="settings">设置</button>
             </div>
 
             <div class="practice-content">
                 <div class="suggestion-section">
-                    <p>试着说一句英语，比如：<span id="example-text">"What is blockchain?"</span></p>
+                    <p>
+                        <span data-i18n="tryToSay">试着说一句英语，比如：</span>
+                        <span id="example-text">"What is blockchain?"</span>
+                    </p>
                 </div>
 
                 <div class="recording-section">
                     <canvas id="visualizer" class="audio-visualizer"></canvas>
                     <div class="controls">
-                        <button id="start-recording" class="btn primary">开始说话</button>
-                        <button id="stop-recording" class="btn secondary" disabled>停止</button>
+                        <button id="start-recording" class="btn primary" data-i18n="startSpeaking">开始说话</button>
+                        <button id="stop-recording" class="btn secondary" disabled data-i18n="stop">停止</button>
                     </div>
                 </div>
 
                 <!-- 加载提示 -->
                 <div id="loading" class="loading-section hidden">
                     <div class="spinner"></div>
-                    <p>正在处理...</p>
+                    <p data-i18n="processing">正在处理...</p>
                 </div>
 
                 <!-- AI反馈区域 -->
                 <div id="feedback" class="feedback-section hidden">
                     <div class="recognized-speech">
-                        <h3>识别到的语音：</h3>
+                        <h3 data-i18n="recognizedSpeech">识别到的语音：</h3>
                         <p id="recognized-text"></p>
                     </div>
 
                     <div class="ai-feedback">
-                        <h3>AI 反馈：</h3>
+                        <h3 data-i18n="aiFeedback">AI 反馈：</h3>
                         <div id="ai-feedback"></div>
                     </div>
 
                     <div class="next-practice">
-                        <h3>下一句练习：</h3>
+                        <h3 data-i18n="nextPractice">下一句练习：</h3>
                         <p id="next-suggestion"></p>
                     </div>
                 </div>

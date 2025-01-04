@@ -1,0 +1,242 @@
+{
+  "extensionName": {
+    "message": "AI英语口语练习",
+    "description": "扩展名称"
+  },
+  "extensionDescription": {
+    "message": "使用实时AI反馈练习英语口语",
+    "description": "扩展描述"
+  },
+  "settings": {
+    "message": "设置",
+    "description": "设置页面标题"
+  },
+  "micPermission": {
+    "message": "麦克风权限",
+    "description": "麦克风权限部分标题"
+  },
+  "unchecked": {
+    "message": "未检查",
+    "description": "权限状态未检查"
+  },
+  "granted": {
+    "message": "已授权",
+    "description": "权限状态已授权"
+  },
+  "denied": {
+    "message": "未授权",
+    "description": "权限状态未授权"
+  },
+  "checkFailed": {
+    "message": "检查失败",
+    "description": "权限检查失败"
+  },
+  "checkMicPermission": {
+    "message": "检查麦克风权限",
+    "description": "检查麦克风权限按钮"
+  },
+  "geminiKeyRequired": {
+    "message": "Google Gemini API Key (必需)",
+    "description": "Gemini API key输入标签"
+  },
+  "enterGeminiKey": {
+    "message": "输入 Gemini API Key",
+    "description": "Gemini API key输入占位符"
+  },
+  "getGeminiKey": {
+    "message": "获取 Gemini API Key",
+    "description": "获取Gemini API key链接"
+  },
+  "elevenlabsKeyOptional": {
+    "message": "ElevenLabs API Key (可选语音功能)",
+    "description": "ElevenLabs API key输入标签"
+  },
+  "enterElevenlabsKey": {
+    "message": "输入 ElevenLabs API Key",
+    "description": "ElevenLabs API key输入占位符"
+  },
+  "getElevenlabsKey": {
+    "message": "获取 ElevenLabs API Key",
+    "description": "获取ElevenLabs API key链接"
+  },
+  "saveAndStart": {
+    "message": "保存并开始练习",
+    "description": "保存按钮文本"
+  },
+  "feedback": {
+    "message": "反馈建议",
+    "description": "反馈部分标题"
+  },
+  "sendFeedback": {
+    "message": "发送反馈",
+    "description": "发送反馈按钮文本"
+  },
+  "practiceTitle": {
+    "message": "英语口语练习",
+    "description": "练习页面标题"
+  },
+  "tryToSay": {
+    "message": "试着说一句英语，比如：",
+    "description": "练习建议文本"
+  },
+  "startSpeaking": {
+    "message": "开始说话",
+    "description": "开始录音按钮文本"
+  },
+  "stop": {
+    "message": "停止",
+    "description": "停止录音按钮文本"
+  },
+  "processing": {
+    "message": "正在处理...",
+    "description": "处理状态文本"
+  },
+  "recognizedSpeech": {
+    "message": "识别到的语音：",
+    "description": "识别语音部分标题"
+  },
+  "aiFeedback": {
+    "message": "AI 反馈：",
+    "description": "AI反馈部分标题"
+  },
+  "nextPractice": {
+    "message": "下一句练习：",
+    "description": "下一句练习部分标题"
+  },
+  "sponsored": {
+    "message": "赞助内容",
+    "description": "赞助内容标签"
+  },
+  "selectEmailService": {
+    "message": "选择邮件服务",
+    "description": "邮件服务选择标题"
+  },
+  "useGmail": {
+    "message": "使用 Gmail 发送",
+    "description": "Gmail按钮文本"
+  },
+  "useOutlook": {
+    "message": "使用 Outlook 发送",
+    "description": "Outlook按钮文本"
+  },
+  "environmentInfo": {
+    "message": "环境信息",
+    "description": "环境信息部分标题"
+  },
+  "saving": {
+    "message": "保存中...",
+    "description": "保存状态文本"
+  },
+  "saveSuccess": {
+    "message": "保存成功",
+    "description": "保存成功消息"
+  },
+  "saveFailed": {
+    "message": "保存失败",
+    "description": "保存失败消息"
+  },
+  "micPermissionRequired": {
+    "message": "需要麦克风访问权限",
+    "description": "麦克风权限要求消息"
+  },
+  "preparingRecording": {
+    "message": "准备录音...",
+    "description": "准备录音状态"
+  },
+  "recordingStarted": {
+    "message": "录音已开始",
+    "description": "录音开始消息"
+  },
+  "errorStartingRecording": {
+    "message": "启动录音失败",
+    "description": "录音错误消息"
+  },
+  "stoppingRecording": {
+    "message": "停止中...",
+    "description": "停止录音状态"
+  },
+  "recordingStopped": {
+    "message": "录音已停止",
+    "description": "录音停止消息"
+  },
+  "errorStoppingRecording": {
+    "message": "停止录音失败",
+    "description": "停止错误消息"
+  },
+  "audioInitializationFailed": {
+    "message": "无法初始化音频服务",
+    "description": "音频服务初始化失败时的错误信息"
+  },
+  "audioServiceRequired": {
+    "message": "录音需要音频服务支持",
+    "description": "音频服务不可用时的错误信息"
+  },
+  "speechProcessingError": {
+    "message": "处理语音时出错",
+    "description": "语音处理一般错误信息"
+  },
+  "speechProcessingTimeout": {
+    "message": "语音处理超时",
+    "description": "语音处理超时错误"
+  },
+  "speechRecognitionError": {
+    "message": "语音识别失败",
+    "description": "语音识别错误"
+  },
+  "retryPrompt": {
+    "message": "请重试",
+    "description": "重试提示"
+  },
+  "feedbackRecognition": {
+    "message": "识别语音",
+    "description": "语音识别部分标题"
+  },
+  "feedbackGrammar": {
+    "message": "语法分析",
+    "description": "语法分析部分标题"
+  },
+  "feedbackPronunciation": {
+    "message": "发音指导",
+    "description": "发音指导部分标题"
+  },
+  "feedbackSuggestions": {
+    "message": "建议",
+    "description": "建议部分标题"
+  },
+  "continueSpeak": {
+    "message": "请继续说一句英语",
+    "description": "下一句练习的默认提示"
+  },
+  "feedbackDescription": {
+    "message": "请在这里描述您遇到的问题或建议：",
+    "description": "反馈描述提示"
+  },
+  "environmentInformation": {
+    "message": "环境信息",
+    "description": "环境信息部分标题"
+  },
+  "versionLabel": {
+    "message": "版本",
+    "description": "版本标签"
+  },
+  "browserLabel": {
+    "message": "浏览器",
+    "description": "浏览器标签"
+  },
+  "systemLabel": {
+    "message": "系统",
+    "description": "系统标签"
+  },
+  "languageLabel": {
+    "message": "语言",
+    "description": "语言标签"
+  },
+  "timeLabel": {
+    "message": "时间",
+    "description": "时间标签"
+  },
+  "feedbackEmailSubject": {
+    "message": "AI英语口语练习反馈",
+    "description": "反馈邮件主题"
+  }
+}
