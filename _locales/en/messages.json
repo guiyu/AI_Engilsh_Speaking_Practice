@@ -1,83 +1,242 @@
 {
-    "extensionName": {
-      "message": "AI English Speaking Practice"
-    },
-    "extensionDescription": {
-      "message": "Practice English speaking with real-time AI feedback"
-    },
-    "settings": {
-      "message": "Settings"
-    },
-    "micPermission": {
-      "message": "Microphone Permission"
-    },
-    "unchecked": {
-      "message": "Unchecked"
-    },
-    "granted": {
-      "message": "Granted"
-    },
-    "denied": {
-      "message": "Denied"
-    },
-    "checkFailed": {
-      "message": "Check Failed"
-    },
-    "checkMicPermission": {
-      "message": "Check Microphone Permission"
-    },
-    "geminiKeyRequired": {
-      "message": "Google Gemini API Key (Required)"
-    },
-    "enterGeminiKey": {
-      "message": "Enter Gemini API Key"
-    },
-    "getGeminiKey": {
-      "message": "Get Gemini API Key"
-    },
-    "elevenlabsKeyOptional": {
-      "message": "ElevenLabs API Key (Optional for voice)"
-    },
-    "enterElevenlabsKey": {
-      "message": "Enter ElevenLabs API Key"
-    },
-    "getElevenlabsKey": {
-      "message": "Get ElevenLabs API Key"
-    },
-    "saveAndStart": {
-      "message": "Save and Start Practice"
-    },
-    "feedback": {
-      "message": "Feedback"
-    },
-    "sendFeedback": {
-      "message": "Send Feedback"
-    },
-    "practiceTitle": {
-      "message": "English Speaking Practice"
-    },
-    "tryToSay": {
-      "message": "Try to say something in English, like:"
-    },
-    "startSpeaking": {
-      "message": "Start Speaking"
-    },
-    "stop": {
-      "message": "Stop"
-    },
-    "processing": {
-      "message": "Processing..."
-    },
-    "recognizedSpeech": {
-      "message": "Recognized Speech:"
-    },
-    "aiFeedback": {
-      "message": "AI Feedback:"
-    },
-    "nextPractice": {
-      "message": "Next Practice:"
-    },
-    "sponsored": {
-      "message": "Sponsored"
-    }
+  "extensionName": {
+    "message": "AI English Speaking Practice",
+    "description": "The name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Practice English speaking with real-time AI feedback",
+    "description": "The description of the extension"
+  },
+  "settings": {
+    "message": "Settings",
+    "description": "Settings page title"
+  },
+  "micPermission": {
+    "message": "Microphone Permission",
+    "description": "Microphone permission section title"
+  },
+  "unchecked": {
+    "message": "Unchecked",
+    "description": "Permission status unchecked"
+  },
+  "granted": {
+    "message": "Granted",
+    "description": "Permission status granted"
+  },
+  "denied": {
+    "message": "Denied",
+    "description": "Permission status denied"
+  },
+  "checkFailed": {
+    "message": "Check Failed",
+    "description": "Permission check failed"
+  },
+  "checkMicPermission": {
+    "message": "Check Microphone Permission",
+    "description": "Button to check microphone permission"
+  },
+  "geminiKeyRequired": {
+    "message": "Google Gemini API Key (Required)",
+    "description": "Gemini API key input label"
+  },
+  "enterGeminiKey": {
+    "message": "Enter Gemini API Key",
+    "description": "Gemini API key input placeholder"
+  },
+  "getGeminiKey": {
+    "message": "Get Gemini API Key",
+    "description": "Link to get Gemini API key"
+  },
+  "elevenlabsKeyOptional": {
+    "message": "ElevenLabs API Key (Optional for voice)",
+    "description": "ElevenLabs API key input label"
+  },
+  "enterElevenlabsKey": {
+    "message": "Enter ElevenLabs API Key",
+    "description": "ElevenLabs API key input placeholder"
+  },
+  "getElevenlabsKey": {
+    "message": "Get ElevenLabs API Key",
+    "description": "Link to get ElevenLabs API key"
+  },
+  "saveAndStart": {
+    "message": "Save and Start Practice",
+    "description": "Save button text"
+  },
+  "feedback": {
+    "message": "Feedback",
+    "description": "Feedback section title"
+  },
+  "sendFeedback": {
+    "message": "Send Feedback",
+    "description": "Send feedback button text"
+  },
+  "practiceTitle": {
+    "message": "English Speaking Practice",
+    "description": "Practice page title"
+  },
+  "tryToSay": {
+    "message": "Try to say something in English, like:",
+    "description": "Practice suggestion text"
+  },
+  "startSpeaking": {
+    "message": "Start Speaking",
+    "description": "Start recording button text"
+  },
+  "stop": {
+    "message": "Stop",
+    "description": "Stop recording button text"
+  },
+  "processing": {
+    "message": "Processing...",
+    "description": "Processing status text"
+  },
+  "recognizedSpeech": {
+    "message": "Recognized Speech:",
+    "description": "Recognized speech section title"
+  },
+  "aiFeedback": {
+    "message": "AI Feedback:",
+    "description": "AI feedback section title"
+  },
+  "nextPractice": {
+    "message": "Next Practice:",
+    "description": "Next practice section title"
+  },
+  "sponsored": {
+    "message": "Sponsored",
+    "description": "Sponsored content label"
+  },
+  "selectEmailService": {
+    "message": "Select Email Service",
+    "description": "Email service selection title"
+  },
+  "useGmail": {
+    "message": "Use Gmail",
+    "description": "Gmail button text"
+  },
+  "useOutlook": {
+    "message": "Use Outlook",
+    "description": "Outlook button text"
+  },
+  "environmentInfo": {
+    "message": "Environment Information",
+    "description": "Environment info section title"
+  },
+  "saving": {
+    "message": "Saving...",
+    "description": "Saving status text"
+  },
+  "saveSuccess": {
+    "message": "Save Successful",
+    "description": "Save success message"
+  },
+  "saveFailed": {
+    "message": "Save Failed",
+    "description": "Save failed message"
+  },
+  "micPermissionRequired": {
+    "message": "Microphone permission is required",
+    "description": "Microphone permission required message"
+  },
+  "preparingRecording": {
+    "message": "Preparing Recording...",
+    "description": "Preparing recording status"
+  },
+  "recordingStarted": {
+    "message": "Recording Started",
+    "description": "Recording started message"
+  },
+  "errorStartingRecording": {
+    "message": "Error Starting Recording",
+    "description": "Recording error message"
+  },
+  "stoppingRecording": {
+    "message": "Stopping...",
+    "description": "Stopping recording status"
+  },
+  "recordingStopped": {
+    "message": "Recording Stopped",
+    "description": "Recording stopped message"
+  },
+  "errorStoppingRecording": {
+    "message": "Error Stopping Recording",
+    "description": "Stopping error message"
+  },
+  "audioInitializationFailed": {
+    "message": "Failed to initialize audio service",
+    "description": "Error message when audio service initialization fails"
+  },
+  "audioServiceRequired": {
+    "message": "Audio service is required for recording",
+    "description": "Error message when audio service is not available"
+  },
+  "speechProcessingError": {
+    "message": "Error processing speech",
+    "description": "General speech processing error message"
+  },
+  "speechProcessingTimeout": {
+    "message": "Speech processing timed out",
+    "description": "Timeout error during speech processing"
+  },
+  "speechRecognitionError": {
+    "message": "Speech recognition failed",
+    "description": "Error in speech recognition"
+  },
+  "retryPrompt": {
+    "message": "Please try again",
+    "description": "Prompt to retry the operation"
+  },
+  "feedbackRecognition": {
+    "message": "Speech Recognition",
+    "description": "Title for recognized speech section"
+  },
+  "feedbackGrammar": {
+    "message": "Grammar Analysis",
+    "description": "Title for grammar analysis section"
+  },
+  "feedbackPronunciation": {
+    "message": "Pronunciation Guide",
+    "description": "Title for pronunciation guidance section"
+  },
+  "feedbackSuggestions": {
+    "message": "Suggestions",
+    "description": "Title for suggestions section"
+  },
+  "continueSpeak": {
+    "message": "Please say another sentence in English",
+    "description": "Default prompt for next practice"
+  },
+   "feedbackDescription": {
+    "message": "Please describe your issue or suggestion here:",
+    "description": "Prompt for feedback description"
+  },
+  "environmentInformation": {
+    "message": "Environment Information",
+    "description": "Environment information section header"
+  },
+  "versionLabel": {
+    "message": "Version",
+    "description": "Version label in debug info"
+  },
+  "browserLabel": {
+    "message": "Browser",
+    "description": "Browser label in debug info"
+  },
+  "systemLabel": {
+    "message": "System",
+    "description": "System label in debug info"
+  },
+  "languageLabel": {
+    "message": "Language",
+    "description": "Language label in debug info"
+  },
+  "timeLabel": {
+    "message": "Time",
+    "description": "Time label in debug info"
+  },
+  "feedbackEmailSubject": {
+    "message": "AI English Speaking Practice Feedback",
+    "description": "Email subject for feedback"
   }
+}
