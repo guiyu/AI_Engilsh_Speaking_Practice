@@ -11,7 +11,9 @@
     "webNavigation"
   ],
   "host_permissions": [
-    "*://*/*"
+    "*://*/*",
+    "https://pagead2.googlesyndication.com/*"
+
   ],
   "background": {
     "service_worker": "src/background/background.js",
@@ -19,6 +21,8 @@
   },
   "web_accessible_resources": [{
     "resources":  [
+      "src/pages/ads/ads.html",
+      "src/pages/ads/ads.js",
       "src/pages/feedback/feedback.html",
       "src/pages/feedback/feedback.css",
       "src/pages/feedback/feedback.js",

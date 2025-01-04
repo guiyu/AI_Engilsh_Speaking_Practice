@@ -8,6 +8,8 @@ import { AudioVisualizer } from '../utils/audioVisualizer.js';
 import { SpeechRecognition } from '../utils/speechRecognition.js';
 import { WebSocketService } from '../services/websocketService.js'
 import { Logger } from '../utils/logger.js';
+import { AdsService } from '../services/adsService.js';
+
 
 class PopupManager {
     constructor() {
@@ -17,6 +19,7 @@ class PopupManager {
         this.geminiService = null;
         this.elevenlabsService = null;
         this.recognition = new SpeechRecognition();
+        this.adsService = new AdsService();
         
         // 获取DOM元素引用
         this.permissionView = null;
@@ -34,11 +37,20 @@ class PopupManager {
         };
         
         // 确保DOM加载完成后再初始化UI
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            await this.initializeServices();
             this.initializeDOMElements();
             this.initializeUI();
             this.setupEventListeners();
         });
+    }
+
+    async initializeServices() {
+        try {
+            await this.adsService.initialize();
+        } catch (error) {
+            console.error('Service initialization error:', error);
+        }
     }
 
     initializeDOMElements() {
@@ -130,6 +142,18 @@ class PopupManager {
             this.showPracticeView();
         } else {
             this.showSetupView();
+        }
+    }
+
+    showPracticeView() {
+        if (this.setupView && this.practiceView) {
+            this.setupView.classList.add('hidden');
+            this.practiceView.classList.remove('hidden');
+            
+            // 显示广告
+            if (this.adsService.initialized) {
+                this.adsService.displayAd('practice-ads');
+            }
         }
     }
 
@@ -295,6 +319,11 @@ class PopupManager {
         if (this.setupView && this.practiceView) {
             this.setupView.classList.add('hidden');
             this.practiceView.classList.remove('hidden');
+            
+            // 初始化广告
+            if (this.adsService) {
+                this.adsService.initialize();
+            }
         }
     }
 
