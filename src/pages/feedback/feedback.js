@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 --------------------------------
-设备信息：
+环境信息：
 - 版本：${info.version}
 - 浏览器：${info.userAgent}
 - 系统：${info.platform}
