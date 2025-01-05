@@ -1,6 +1,6 @@
 // 创建 logger.js 在 utils 目录下
 import { DebugPanel } from './debugPanel.js';
-const IS_DEVELOPMENT = true; // 在这里控制是否为开发环境
+const IS_DEVELOPMENT = false; // 在这里控制是否为开发环境
 
 export class Logger {
     static log(...args) {
