@@ -1,0 +1,94 @@
+{
+    "extensionName": {
+      "message": "AI English Speaking Practice",
+      "description": "Extension and website name"
+    },
+    "extensionDescription": {
+      "message": "Practice English speaking with real-time AI feedback using our Chrome extension",
+      "description": "Meta description"
+    },
+    "landingTitle": {
+      "message": "Master English Speaking with AI",
+      "description": "Main title on landing page"
+    },
+    "landingSubtitle": {
+      "message": "Get real-time feedback on your pronunciation and grammar",
+      "description": "Subtitle on landing page"
+    },
+    "addToChrome": {
+      "message": "Add to Chrome",
+      "description": "Add to Chrome button text"
+    },
+    "keyFeatures": {
+      "message": "Key Features",
+      "description": "Features section title"
+    },
+    "featureRecognition": {
+      "message": "Real-time Voice Recognition",
+      "description": "Feature 1 title"
+    },
+    "featureRecognitionDesc": {
+      "message": "Accurate capture of your English speech with advanced voice recognition technology.",
+      "description": "Feature 1 description"
+    },
+    "featureAI": {
+      "message": "AI Analysis",
+      "description": "Feature 2 title"
+    },
+    "featureAIDesc": {
+      "message": "Get instant feedback on grammar and pronunciation from our advanced AI model.",
+      "description": "Feature 2 description"
+    },
+    "featureVoice": {
+      "message": "Natural Voice Synthesis",
+      "description": "Feature 3 title"
+    },
+    "featureVoiceDesc": {
+      "message": "Hear perfect pronunciation with AI-powered voice demonstration.",
+      "description": "Feature 3 description"
+    },
+    "howItWorks": {
+      "message": "How It Works",
+      "description": "How it works section title"
+    },
+    "step1Title": {
+      "message": "Install Extension",
+      "description": "Step 1 title"
+    },
+    "step1Desc": {
+      "message": "Add our extension to Chrome browser",
+      "description": "Step 1 description"
+    },
+    "step2Title": {
+      "message": "Speak English",
+      "description": "Step 2 title"
+    },
+    "step2Desc": {
+      "message": "Say any English phrase you want to practice",
+      "description": "Step 2 description"
+    },
+    "step3Title": {
+      "message": "Get Feedback",
+      "description": "Step 3 title"
+    },
+    "step3Desc": {
+      "message": "Receive instant AI analysis and corrections",
+      "description": "Step 3 description"
+    },
+    "step4Title": {
+      "message": "Improve",
+      "description": "Step 4 title"
+    },
+    "step4Desc": {
+      "message": "Practice with suggested sentences",
+      "description": "Step 4 description"
+    },
+    "contact": {
+      "message": "Contact",
+      "description": "Contact link text"
+    },
+    "copyright": {
+      "message": "© 2024 AI English Speaking Practice. All rights reserved.",
+      "description": "Copyright text"
+    }
+  }

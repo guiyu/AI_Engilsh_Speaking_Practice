@@ -1,0 +1,94 @@
+{
+    "extensionName": {
+      "message": "AI英语口语练习",
+      "description": "扩展和网站名称"
+    },
+    "extensionDescription": {
+      "message": "使用AI技术实时练习英语口语，获得即时反馈",
+      "description": "元描述"
+    },
+    "landingTitle": {
+      "message": "用AI掌握英语口语",
+      "description": "首页主标题"
+    },
+    "landingSubtitle": {
+      "message": "获得实时发音和语法反馈",
+      "description": "首页副标题"
+    },
+    "addToChrome": {
+      "message": "添加到Chrome",
+      "description": "添加到Chrome按钮文本"
+    },
+    "keyFeatures": {
+      "message": "核心功能",
+      "description": "功能部分标题"
+    },
+    "featureRecognition": {
+      "message": "实时语音识别",
+      "description": "功能1标题"
+    },
+    "featureRecognitionDesc": {
+      "message": "使用先进的语音识别技术准确捕捉您的英语发音。",
+      "description": "功能1描述"
+    },
+    "featureAI": {
+      "message": "AI智能分析",
+      "description": "功能2标题"
+    },
+    "featureAIDesc": {
+      "message": "从我们的高级AI模型获得即时语法和发音反馈。",
+      "description": "功能2描述"
+    },
+    "featureVoice": {
+      "message": "自然语音合成",
+      "description": "功能3标题"
+    },
+    "featureVoiceDesc": {
+      "message": "通过AI驱动的语音演示听取标准发音。",
+      "description": "功能3描述"
+    },
+    "howItWorks": {
+      "message": "使用方法",
+      "description": "使用方法部分标题"
+    },
+    "step1Title": {
+      "message": "安装扩展",
+      "description": "步骤1标题"
+    },
+    "step1Desc": {
+      "message": "将我们的扩展添加到Chrome浏览器",
+      "description": "步骤1描述"
+    },
+    "step2Title": {
+      "message": "说英语",
+      "description": "步骤2标题"
+    },
+    "step2Desc": {
+      "message": "说出任何你想练习的英语短语",
+      "description": "步骤2描述"
+    },
+    "step3Title": {
+      "message": "获取反馈",
+      "description": "步骤3标题"
+    },
+    "step3Desc": {
+      "message": "接收即时AI分析和纠正",
+      "description": "步骤3描述"
+    },
+    "step4Title": {
+      "message": "提高",
+      "description": "步骤4标题"
+    },
+    "step4Desc": {
+      "message": "使用建议的句子练习",
+      "description": "步骤4描述"
+    },
+    "contact": {
+      "message": "联系我们",
+      "description": "联系链接文本"
+    },
+    "copyright": {
+      "message": "© 2024 AI英语口语练习助手。保留所有权利。",
+      "description": "版权文本"
+    }
+  }
