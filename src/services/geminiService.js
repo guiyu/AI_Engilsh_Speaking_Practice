@@ -28,14 +28,32 @@ export class GeminiService {
             const initialMsg = {
                 contents: [{
                     parts: [{
-                        text: `你是一名专业的英语口语指导老师，你需要帮助用户纠正语法发音，用户将会说一句英文，然后你会给出识别出来的英语是什么，并且告诉他发音中有什么问题，语法有什么错误，并且一步一步的纠正他的发音，当一次发音正确后，根据当前语句提出下一个场景的语句,然后一直循环这个过程。你的回答永远要保持中文：
-    1. 语音识别：<用户说的原文>
-    2. 语法分析：<分析句子语法正确性和结构>
-    3. 发音指导：<分析关键音素，重音和语调>
-    4. 实用建议：<2-3个类似场景的标准回答>
-    5. 下一句：<根据当前主题建议练习的下一句>
-    
-    请严格按照此格式回复，每个部分另起一行，仅在每个部分后提供对应的内容。如果明白了请回答OK。`
+                        text: `As an English language educator, analyze this sentence: 
+
+ANALYSIS GUIDELINES:
+1. Speech Recognition:
+- Record the student's exact words
+- Note any obvious pronunciation errors
+
+2. Grammar & Expression Analysis:
+- Identify key grammatical issues (if any)
+- Point out unnatural expressions
+- Check sentence structure and word choice
+
+3. Improvement Suggestions:
+- Provide 2 more natural expressions
+- Focus on making it more idiomatic
+- Add intonation guidance if necessary
+
+
+IMPORTANT NOTES:
+- Maintain a professional teaching tone
+- Focus on language improvement
+- Keep responses concise and clear
+- Respond in Chinese
+- Stay under 1024 characters
+
+如果明白了，请回复"OK"。`
                     }]
                 }],
                 generationConfig: {
@@ -132,7 +150,29 @@ export class GeminiService {
                     {
                         parts: [
                             {
-                                text: `用户说了这句话: ${text}`
+                                text: `分析这句英语："${text}"
+
+请按以下格式回答：
+
+1. 语音识别：
+- 直接复述用户的句子
+- 如果有因为发音错误，导致语义理解错误的地方，指出来
+
+2. 语法问题：
+- 列出主要语法错误（如果有）
+- 说明不地道的表达
+
+3. 改进建议：
+- 给出1-2个更地道的表达方式
+- 解释为什么这样更好
+
+4. 下一句练习：
+- 根据当前话题给出一个继续练习的方向，不要提供具体的语句。比如“如果你想聊聊今天的天气，你会怎么说？”
+
+注意：
+- 每个部分限制在2-5行
+- 重点关注表达是否地道
+- 只在因为发音错误太多，导致语义理解错误的地方才特意指出来`
                             }
                         ]
                     }
@@ -167,54 +207,41 @@ export class GeminiService {
             const text = response.candidates[0].content?.parts?.[0]?.text || '';
             Logger.log('Full AI response:', text);
     
-            // 提取用户的原始输入
-            let recognition = '';
-            const matchRecognition = text.match(/用户说[：:]\s*[""](.+?)[""]/) || 
-                                   text.match(/识别[：:]\s*[""](.+?)[""]/);
-            if (matchRecognition) {
-                recognition = matchRecognition[1];
-            }
-    
-            // 把Markdown格式的列表项转换为正常文本
-            const cleanText = text.replace(/\*\*/g, '')  // 移除加粗标记
-                                 .replace(/\* /g, '')    // 移除列表标记
-                                 .split('\n')            // 按行分割
-                                 .map(line => line.trim())
-                                 .filter(line => line);  // 移除空行
-    
-            // 构建返回对象
+            const sections = text.split('\n').filter(line => line.trim());
             const result = {
-                recognition: recognition,
+                recognition: '',
                 grammar: '',
                 pronunciation: '',
                 suggestions: '',
                 nextPrompt: ''
             };
     
-            // 尝试提取各部分内容
             let currentSection = '';
-            for (const line of cleanText) {
-                // 根据关键词识别段落类型
-                if (line.includes('语法') || line.includes('句子结构')) {
+            for (const line of sections) {
+                if (line.includes('语音识别')) {
+                    currentSection = 'recognition';
+                    continue;
+                } else if (line.includes('语法问题')) {
                     currentSection = 'grammar';
                     continue;
-                } else if (line.includes('发音') || line.includes('音素')) {
-                    currentSection = 'pronunciation';
-                    continue;
-                } else if (line.includes('建议') || line.includes('改进')) {
+                } else if (line.includes('改进建议')) {
                     currentSection = 'suggestions';
+                    continue;
+                } else if (line.includes('下一句练习')) {
+                    currentSection = 'nextPrompt';
                     continue;
                 }
     
-                // 累加当前段落的内容
                 if (currentSection && result[currentSection] !== undefined) {
-                    result[currentSection] += (result[currentSection] ? '\n' : '') + line;
+                    if (line.trim() && !line.includes('：')) {
+                        result[currentSection] += (result[currentSection] ? '\n' : '') + line.trim();
+                    }
                 }
             }
     
-            // 如果没有结构化解析出内容，就把完整回复放到suggestions中
+            // 确保至少有建议部分
             if (!result.grammar && !result.pronunciation && !result.suggestions) {
-                result.suggestions = cleanText.join('\n');
+                result.suggestions = sections.join('\n');
             }
     
             Logger.log('Parsed result:', result);
