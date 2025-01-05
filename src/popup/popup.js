@@ -569,16 +569,26 @@ class PopupManager {
             
             if (this.elevenlabsService && feedback.suggestions) {
                 try {
-                    // 修改这部分代码
                     if (this.currentAudio) {
                         this.currentAudio.pause();
-                        this.currentAudio.currentTime = 0;
+                        this.currentAudio = null;
                     }
+                    
                     const audio = await this.elevenlabsService.synthesizeSpeech(feedback.suggestions);
-                    this.currentAudio = audio;
-                    audio.play();
+                    if (audio) {
+                        this.currentAudio = audio;
+                        const playPromise = audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                Logger.error('Audio playback failed:', error);
+                            });
+                        }
+                    } else {
+                        Logger.warn('Speech synthesis returned null audio');
+                    }
                 } catch (error) {
                     Logger.error('Speech synthesis error:', error);
+                    // 不要抛出错误，让程序继续执行
                 }
             }
         } catch (error) {

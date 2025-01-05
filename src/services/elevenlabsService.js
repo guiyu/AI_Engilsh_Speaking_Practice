@@ -1,3 +1,5 @@
+import { Logger } from '../utils/logger.js';
+
 export class ElevenlabsService {
     constructor(apiKey) {
         this.apiKey = apiKey;
@@ -7,6 +9,11 @@ export class ElevenlabsService {
 
     async synthesizeSpeech(text) {
         try {
+            if (!this.apiKey || !text) {
+                Logger.warn('Missing API key or text for speech synthesis');
+                return null;
+            }
+
             const response = await fetch(`${this.baseUrl}/text-to-speech/${this.voiceId}/stream`, {
                 method: 'POST',
                 headers: {
@@ -24,22 +31,40 @@ export class ElevenlabsService {
             });
 
             if (!response.ok) {
-                throw new Error('Speech synthesis failed');
+                const errorText = await response.text();
+                Logger.error('ElevenLabs API error response:', errorText);
+                return null;
             }
 
             const audioBlob = await response.blob();
+            if (audioBlob.size === 0) {
+                Logger.error('Received empty audio blob');
+                return null;
+            }
+
             const audio = new Audio(URL.createObjectURL(audioBlob));
             
-            // 添加音频结束时的清理
-            audio.onended = () => {
-                URL.revokeObjectURL(audio.src); // 清理 Blob URL
+            // 添加错误处理
+            audio.onerror = (e) => {
+                Logger.error('Audio playback error:', e);
+                URL.revokeObjectURL(audio.src);
+            };
+
+            // 添加加载处理
+            audio.onloadeddata = () => {
+                Logger.info('Audio loaded successfully');
             };
             
+            // 添加结束处理
+            audio.onended = () => {
+                URL.revokeObjectURL(audio.src);
+                Logger.info('Audio playback completed');
+            };
+
             return audio;
-            
         } catch (error) {
-            console.error('ElevenLabs API error:', error);
-            throw new Error('Failed to generate speech');
+            Logger.error('ElevenLabs API error:', error);
+            return null;
         }
     }
 }
