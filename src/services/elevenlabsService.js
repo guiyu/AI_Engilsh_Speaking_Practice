@@ -4,14 +4,14 @@ export class ElevenlabsService {
     constructor(apiKey) {
         this.apiKey = apiKey;
         this.baseUrl = 'https://api.elevenlabs.io/v1';
-        this.voiceId = 'nPczCjzI2devNBz1zQrb'; // Default voice ID
+        this.voiceId = 'nPczCjzI2devNBz1zQrb';
     }
 
     async synthesizeSpeech(text) {
         try {
             if (!this.apiKey || !text) {
-                Logger.warn('Missing API key or text for speech synthesis');
-                return null;
+                console.warn('Missing API key or text for speech synthesis');
+                return { error: 'missing_parameters' };
             }
 
             const response = await fetch(`${this.baseUrl}/text-to-speech/${this.voiceId}/stream`, {
@@ -31,40 +31,42 @@ export class ElevenlabsService {
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                Logger.error('ElevenLabs API error response:', errorText);
-                return null;
+                const errorJson = await response.json();
+                Logger.error('ElevenLabs API error response:', errorJson);
+                
+                // 检查是否是配额超限错误
+                if (errorJson.detail?.status === 'quota_exceeded') {
+                    return { 
+                        error: 'quota_exceeded',
+                        message: errorJson.detail.message
+                    };
+                }
+                
+                return { error: 'api_error' };
             }
 
+            // 其余代码保持不变...
             const audioBlob = await response.blob();
             if (audioBlob.size === 0) {
                 Logger.error('Received empty audio blob');
-                return null;
+                return { error: 'empty_audio' };
             }
 
             const audio = new Audio(URL.createObjectURL(audioBlob));
-            
-            // 添加错误处理
             audio.onerror = (e) => {
                 Logger.error('Audio playback error:', e);
                 URL.revokeObjectURL(audio.src);
             };
 
-            // 添加加载处理
-            audio.onloadeddata = () => {
-                Logger.info('Audio loaded successfully');
-            };
-            
-            // 添加结束处理
             audio.onended = () => {
                 URL.revokeObjectURL(audio.src);
-                Logger.info('Audio playback completed');
             };
 
-            return audio;
+            return { audio };
+            
         } catch (error) {
             Logger.error('ElevenLabs API error:', error);
-            return null;
+            return { error: 'unknown_error' };
         }
     }
 }

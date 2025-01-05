@@ -238,5 +238,17 @@
   "feedbackEmailSubject": {
     "message": "AI English Speaking Practice Feedback",
     "description": "Email subject for feedback"
+  },
+  "elevenlabsQuotaExceeded": {
+    "message": "ElevenLabs quota exceeded. Voice feature is temporarily unavailable.",
+    "description": "Message shown when ElevenLabs API quota is exceeded"
+  },
+  "voiceServiceUnavailable": {
+    "message": "Voice synthesis service is temporarily unavailable. Please try again later.",
+    "description": "Message shown when voice service is unavailable"
+  },
+  "voiceSynthesisError": {
+    "message": "Voice synthesis error. Please try again.",
+    "description": "Message shown when voice synthesis fails"
   }
 }

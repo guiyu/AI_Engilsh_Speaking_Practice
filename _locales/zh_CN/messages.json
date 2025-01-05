@@ -238,5 +238,17 @@
   "feedbackEmailSubject": {
     "message": "AI英语口语练习反馈",
     "description": "反馈邮件主题"
+  },
+  "elevenlabsQuotaExceeded": {
+    "message": "ElevenLabs 额度已用完，语音功能暂时无法使用。",
+    "description": "配额超限时显示的消息"
+  },
+  "voiceServiceUnavailable": {
+    "message": "语音合成服务暂时不可用，请稍后再试。",
+    "description": "语音服务不可用时显示的消息"
+  },
+  "voiceSynthesisError": {
+    "message": "语音合成出错，请稍后重试。",
+    "description": "语音合成失败时显示的消息"
   }
 }

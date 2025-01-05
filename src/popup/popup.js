@@ -574,21 +574,29 @@ class PopupManager {
                         this.currentAudio = null;
                     }
                     
-                    const audio = await this.elevenlabsService.synthesizeSpeech(feedback.suggestions);
-                    if (audio) {
-                        this.currentAudio = audio;
-                        const playPromise = audio.play();
+                    const result = await this.elevenlabsService.synthesizeSpeech(feedback.suggestions);
+                    
+                    if (result.error) {
+                        if (result.error === 'quota_exceeded') {
+                            this.showToast(i18n.getMessage('elevenlabsQuotaExceeded'), 'warning');
+                        } else {
+                            this.showToast(i18n.getMessage('voiceServiceUnavailable'), 'error');
+                        }
+                        return;
+                    }
+            
+                    if (result.audio) {
+                        this.currentAudio = result.audio;
+                        const playPromise = this.currentAudio.play();
                         if (playPromise !== undefined) {
                             playPromise.catch(error => {
                                 Logger.error('Audio playback failed:', error);
                             });
                         }
-                    } else {
-                        Logger.warn('Speech synthesis returned null audio');
                     }
                 } catch (error) {
                     Logger.error('Speech synthesis error:', error);
-                    // 不要抛出错误，让程序继续执行
+                    this.showToast(i18n.getMessage('voiceSynthesisError'), 'error');
                 }
             }
         } catch (error) {
