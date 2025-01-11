@@ -250,5 +250,53 @@
   "voiceSynthesisError": {
     "message": "语音合成出错，请稍后重试。",
     "description": "语音合成失败时显示的消息"
+  },
+  "freeUsageRemaining": {
+      "message": "今日剩余使用次数：",
+      "description": "显示剩余免费使用次数"
+  },
+  "upgradeToPro": {
+      "message": "升级到Pro版本",
+      "description": "升级按钮文本"
+  },
+  "proVersionRequired": {
+      "message": "需要Pro版本",
+      "description": "Pro版本功能提示"
+  },
+  "apiKeyError": {
+      "message": "获取API密钥错误",
+      "description": "API密钥错误信息"
+  },
+  "usageLimitReached": {
+      "message": "已达到每日使用限制",
+      "description": "使用限制提示"
+  },
+  "proFeatureDescription": {
+      "message": "Pro版本包含无限次数使用和语音合成功能",
+      "description": "Pro版本特性描述"
+  },
+  "enterLicenseKey": {
+      "message": "输入许可证密钥",
+      "description": "许可证密钥输入提示"
+  },
+  "invalidLicenseKey": {
+      "message": "无效的许可证密钥",
+      "description": "无效许可证提示"
+  },
+  "upgradeSuccess": {
+      "message": "成功升级到Pro版本",
+      "description": "升级成功提示"
+  },
+  "upgradeFailed": {
+      "message": "升级到Pro版本失败",
+      "description": "升级失败提示"
+  },
+  "freeDailyLimit": {
+      "message": "免费版本：每天10次使用机会",
+      "description": "免费版本限制说明"
+  },
+  "proUnlimited": {
+      "message": "Pro版本：无限次数使用",
+      "description": "Pro版本特性说明"
   }
 }

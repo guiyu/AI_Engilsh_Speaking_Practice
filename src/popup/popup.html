@@ -11,6 +11,13 @@
         <div id="setup-view" class="view">
             <h2 data-i18n="settings">设置</h2>
             <div class="setup-content">
+                        <!-- 添加使用统计显示区域 -->
+                <div id="usage-stats" class="usage-stats">
+                    <div class="usage-info">
+                        <span data-i18n="freeUsageRemaining">今日剩余使用次数：</span>
+                        <span id="remaining-count">--</span>
+                    </div>
+                </div>
                 <!-- 麦克风权限检查 -->
                 <div class="permission-section">
                     <h3 data-i18n="micPermission">麦克风权限</h3>
@@ -26,20 +33,17 @@
 
                 <!-- API密钥设置 -->
                 <div class="api-section">
-                    <div class="form-group">
-                        <label for="gemini-key" data-i18n="geminiKeyRequired">Google Gemini API Key (必需)</label>
-                        <input type="password" id="gemini-key" data-i18n="enterGeminiKey" placeholder="输入 Gemini API Key" required>
-                        <div class="hint">
-                            <a href="https://aistudio.google.com/app/apikey" target="_blank" data-i18n="getGeminiKey">获取 Gemini API Key</a>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="elevenlabs-key" data-i18n="elevenlabsKeyOptional">ElevenLabs API Key (可选语音功能)</label>
+                    <div id="pro-section" class="form-group" style="display: none;">
+                        <label for="elevenlabs-key" data-i18n="elevenlabsKeyOptional">ElevenLabs API Key (Pro)</label>
                         <input type="password" id="elevenlabs-key" data-i18n="enterElevenlabsKey" placeholder="输入 ElevenLabs API Key">
                         <div class="hint">
                             <a href="https://elevenlabs.io" target="_blank" data-i18n="getElevenlabsKey">获取 ElevenLabs API Key</a>
                         </div>
+                    </div>
+                    
+                    <div id="free-section" class="usage-info">
+                        <p data-i18n="freeUsageRemaining">今日剩余使用次数：<span id="remaining-count">30</span></p>
+                        <button id="upgrade-btn" class="btn secondary" data-i18n="upgradeToPro">升级到Pro版本</button>
                     </div>
 
                     <button id="save-setup" class="btn primary" disabled>

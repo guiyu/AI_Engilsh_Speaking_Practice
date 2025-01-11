@@ -1,5 +1,17 @@
 // src/popup/popup.js
-
+/**
+ * 导入说明：
+ * - AudioService: 音频处理服务
+ * - GeminiService: Gemini API 服务
+ * - ElevenlabsService: 语音合成服务
+ * - StorageManager: 存储管理
+ * - LicenseManager: 许可证和使用限制管理
+ * - AudioVisualizer: 音频可视化
+ * - SpeechRecognition: 语音识别
+ * - WebSocketService: WebSocket 服务
+ * - Logger: 日志服务
+ * - i18n: 国际化服务
+ */
 import { AudioService } from '../services/audioService.js';
 import { GeminiService } from '../services/geminiService.js';
 import { ElevenlabsService } from '../services/elevenlabsService.js';
@@ -9,6 +21,7 @@ import { SpeechRecognition } from '../utils/speechRecognition.js';
 import { WebSocketService } from '../services/websocketService.js'
 import { Logger } from '../utils/logger.js';
 import { i18n } from '../utils/i18n.js';
+import { LicenseManager } from '../utils/licenseManager.js';  // 添加这行导入语句
 
 
 class PopupManager {
@@ -27,6 +40,7 @@ class PopupManager {
         this.isProcessing = false;
         this.isRecordingStarting = false; // 添加状态锁
         this.currentAudio = null; // 添加属性跟踪当前播放的音频
+        this.initialized = false;
 
         this.recognition.onresult = (event) => {
             const transcript = Array.from(event.results)
@@ -46,6 +60,13 @@ class PopupManager {
         document.addEventListener('DOMContentLoaded', () => {
             i18n.initializeI18n();
         });
+
+        // 等待DOM加载完成
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init());
+        } else {
+            this.init();
+        }
     }
 
     initializeDOMElements() {
@@ -69,6 +90,42 @@ class PopupManager {
         await this.checkMicrophonePermission();
         await this.checkApiKeys();
         this.setupEventListeners();
+                
+        const { isPro } = await StorageManager.getKeys();
+        this.updateVersionUI(isPro);
+        await this.updateUsageCount();
+    }
+
+    async updateVersionUI(isPro) {
+        const proSection = document.getElementById('pro-section');
+        const freeSection = document.getElementById('free-section');
+        
+        if (isPro) {
+            proSection.style.display = 'block';
+            freeSection.style.display = 'none';
+        } else {
+            proSection.style.display = 'none';
+            freeSection.style.display = 'block';
+        }
+    }
+
+    async updateUsageCount() {
+        const userId = await this.getUserId();
+        const { remainingCount } = await LicenseManager.checkUsageLimit(userId);
+        
+        if (remainingCount >= 0) {
+            document.getElementById('remaining-count').textContent = remainingCount;
+        }
+    }
+
+    async getUserId() {
+        // 获取或生成用户唯一标识
+        let userId = await chrome.storage.local.get(['userId']);
+        if (!userId.userId) {
+            userId = crypto.randomUUID();
+            await chrome.storage.local.set({ userId });
+        }
+        return userId.userId;
     }
 
     async checkMicrophonePermission() {
@@ -152,6 +209,8 @@ class PopupManager {
         if (keys.geminiKey) {
             try {
                 this.geminiService = new GeminiService(keys.geminiKey);
+                await this.geminiService.initialize(); // 确保初始化完成
+
                 // 初始化 WebSocket 服务
                 const wsService = new WebSocketService(keys.geminiKey);
                 wsService.setMessageCallback((response) => {
