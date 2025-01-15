@@ -266,5 +266,9 @@
   "startPractice": {
     "message": "Start Practice",
     "description": "Start practice button text"
+  },
+  "proVersion": {
+    "message": "Pro Version",
+    "description": "Pro version title"
   }
 }

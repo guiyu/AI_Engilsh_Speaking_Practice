@@ -9,24 +9,25 @@
     <div class="container">
         <!-- 权限检查和版本信息视图 -->
         <div id="setup-view" class="view">
-            <h2 data-i18n="settings">设置</h2>
-            <div class="setup-content">
-                <!-- 使用统计显示区域 -->
-                <div id="usage-stats" class="usage-stats">
-                    <div class="usage-info">
-                        <span data-i18n="freeUsageRemaining">今日剩余使用次数：</span>
-                        <span id="remaining-count">--</span>
-                    </div>
+            <div class="setup-header">
+                <h2 data-i18n="settings">设置</h2>
+                <div class="usage-badge">
+                    <span data-i18n="freeUsageRemaining">今日剩余：</span>
+                    <span id="remaining-count" class="count-badge">--</span>
                 </div>
+            </div>
 
+            <div class="setup-content">
                 <!-- 麦克风权限检查 -->
                 <div class="permission-section">
-                    <h3 data-i18n="micPermission">麦克风权限</h3>
-                    <div id="mic-status" class="status-indicator">
-                        <span class="status-icon">⚪</span>
-                        <span class="status-text" data-i18n="unchecked">未检查</span>
+                    <div class="permission-header">
+                        <h3 data-i18n="micPermission">麦克风权限</h3>
+                        <div id="mic-status" class="status-indicator">
+                            <span class="status-icon">⚪</span>
+                            <span class="status-text" data-i18n="unchecked">未检查</span>
+                        </div>
                     </div>
-                    <button id="check-mic" class="btn secondary">
+                    <button id="check-mic" class="btn secondary compact">
                         <span class="icon">🎤</span>
                         <span data-i18n="checkMicPermission">检查麦克风权限</span>
                     </button>
@@ -34,14 +35,21 @@
 
                 <!-- 版本信息部分 -->
                 <div class="version-section">
-                    <div class="free-version">
-                        <h3 data-i18n="freeVersion">免费版</h3>
+                    <div class="version-card free">
+                        <div class="version-header">
+                            <h3 data-i18n="freeVersion">免费版</h3>
+                            <span class="version-badge">当前</span>
+                        </div>
                         <p data-i18n="freeVersionDesc">每天10次免费使用机会</p>
                     </div>
-                    <div class="pro-version">
-                        <h3 data-i18n="proVersion">专业版</h3>
+                    
+                    <div class="version-card pro">
+                        <div class="version-header">
+                            <h3 data-i18n="proVersion">专业版</h3>
+                            <span class="version-badge pro">推荐</span>
+                        </div>
                         <p data-i18n="proVersionDesc">无限次使用 + AI语音合成</p>
-                        <button id="upgrade-btn" class="btn primary">
+                        <button id="upgrade-btn" class="btn primary full-width">
                             <span class="icon">⭐</span>
                             <span data-i18n="upgradeToPro">升级到专业版</span>
                         </button>
@@ -49,18 +57,16 @@
                 </div>
 
                 <!-- 开始练习按钮 -->
-                <button id="save-setup" class="btn primary">
+                <button id="save-setup" class="btn primary highlight full-width">
                     <span class="icon">🎯</span>
                     <span data-i18n="startPractice">开始练习</span>
                 </button>
 
                 <!-- 反馈部分 -->
-                <div class="divider"></div>
                 <div class="feedback-section">
-                    <h3 data-i18n="feedback">反馈建议</h3>
-                    <button id="feedback-btn" class="btn secondary">
+                    <button id="feedback-btn" class="btn text-only">
                         <span class="feedback-icon">💡</span>
-                        <span data-i18n="sendFeedback">发送反馈</span>
+                        <span data-i18n="sendFeedback">反馈建议</span>
                     </button>
                 </div>
             </div>
@@ -69,56 +75,63 @@
         <!-- 练习视图 -->
         <div id="practice-view" class="view hidden">
             <div class="practice-header">
-                <h2 data-i18n="practiceTitle">英语口语练习</h2>
-                <button id="settings" class="btn secondary small" data-i18n="settings">设置</button>
+                <div class="header-content">
+                    <h2 data-i18n="practiceTitle">英语口语练习</h2>
+                    <div class="usage-badge">
+                        <span id="practice-remaining-count" class="count-badge">--</span>
+                    </div>
+                </div>
+                <button id="settings" class="btn icon-only" title="设置">
+                    <span class="icon">⚙️</span>
+                </button>
             </div>
 
             <div class="practice-content">
                 <div class="suggestion-section">
-                    <p>
-                        <span data-i18n="tryToSay">试着说一句英语，比如：</span>
-                        <span id="example-text">"What is blockchain?"</span>
+                    <p class="example-text">
+                        <span data-i18n="tryToSay">试着说：</span>
+                        <span id="example-text" class="highlight">"What is blockchain?"</span>
                     </p>
                 </div>
 
                 <div class="recording-section">
                     <canvas id="visualizer" class="audio-visualizer"></canvas>
                     <div class="controls">
-                        <button id="start-recording" class="btn primary" data-i18n="startSpeaking">开始说话</button>
-                        <button id="stop-recording" class="btn secondary" disabled data-i18n="stop">停止</button>
+                        <button id="start-recording" class="btn primary large">
+                            <span class="icon">🎤</span>
+                            <span data-i18n="startSpeaking">开始说话</span>
+                        </button>
+                        <button id="stop-recording" class="btn secondary large" disabled>
+                            <span class="icon">⏹</span>
+                            <span data-i18n="stop">停止</span>
+                        </button>
                     </div>
-                </div>
-
-                <!-- 加载提示 -->
-                <div id="loading" class="loading-section hidden">
-                    <div class="spinner"></div>
-                    <p data-i18n="processing">正在处理...</p>
                 </div>
 
                 <!-- AI反馈区域 -->
                 <div id="feedback" class="feedback-section hidden">
-                    <div class="recognized-speech">
-                        <h3 data-i18n="recognizedSpeech">识别到的语音：</h3>
-                        <p id="recognized-text"></p>
-                    </div>
+                    <div class="feedback-card">
+                        <div class="recognized-speech">
+                            <span class="label" data-i18n="recognizedSpeech">识别语音</span>
+                            <p id="recognized-text" class="content"></p>
+                        </div>
 
-                    <div class="ai-feedback">
-                        <h3 data-i18n="aiFeedback">AI 反馈：</h3>
-                        <div id="ai-feedback"></div>
-                    </div>
+                        <div class="ai-feedback">
+                            <span class="label" data-i18n="aiFeedback">AI 反馈</span>
+                            <div id="ai-feedback" class="content"></div>
+                        </div>
 
-                    <div class="next-practice">
-                        <h3 data-i18n="nextPractice">下一句练习：</h3>
-                        <p id="next-suggestion"></p>
+                        <div class="next-practice">
+                            <span class="label" data-i18n="nextPractice">下一句练习</span>
+                            <p id="next-suggestion" class="content highlight"></p>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 使用限制提醒（仅在免费版显示）-->
-                <div id="usage-reminder" class="usage-reminder">
-                    <p>
-                        <span data-i18n="freeUsageRemaining">今日剩余使用次数：</span>
-                        <span id="practice-remaining-count">--</span>
-                    </p>
+                <!-- 加载提示 -->
+                <div id="loading" class="loading-overlay hidden">
+                    <div class="spinner"></div>
+                    <p data-i18n="processing">正在处理...</p>
                 </div>
             </div>
         </div>

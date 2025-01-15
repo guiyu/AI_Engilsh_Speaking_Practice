@@ -251,7 +251,7 @@
     "message": "语音合成出错，请稍后重试。",
     "description": "语音合成失败时显示的消息"
   },
-  "proVersionTitle": {
+  "proVersion": {
       "message": "专业版",
       "description": "Pro version title"
   },
