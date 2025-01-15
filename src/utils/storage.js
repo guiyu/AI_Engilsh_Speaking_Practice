@@ -1,25 +1,16 @@
 // storage.js
 export class StorageManager {
     static async getKeys() {
-        const data = await chrome.storage.local.get(['elevenlabsKey', 'isPro']);
-        return {
-            elevenlabsKey: data.isPro ? data.elevenlabsKey : null,
-            isPro: data.isPro || false
-        };
+        return await chrome.storage.local.get(['geminiKey', 'elevenlabsKey']);
     }
 
-    static async saveKeys(elevenlabsKey) {
+    static async saveKeys(geminiKey, elevenlabsKey) {
         await chrome.storage.local.set({
+            geminiKey,
             elevenlabsKey
         });
     }
-
-    static async upgradeToProVersion() {
-        await chrome.storage.local.set({
-            isPro: true
-        });
-    }
-} 
+}
 
 // audioVisualizer.js
 export class AudioVisualizer {

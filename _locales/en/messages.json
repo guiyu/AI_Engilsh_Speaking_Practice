@@ -250,53 +250,5 @@
   "voiceSynthesisError": {
     "message": "Voice synthesis error. Please try again.",
     "description": "Message shown when voice synthesis fails"
-  },
-  "freeUsageRemaining": {
-    "message": "Remaining daily uses: ",
-    "description": "Show remaining free usage count"
-  },
-  "upgradeToPro": {
-      "message": "Upgrade to Pro",
-      "description": "Upgrade button text"
-  },
-  "proVersionRequired": {
-      "message": "Pro version required",
-      "description": "Pro version feature notice"
-  },
-  "apiKeyError": {
-      "message": "Error getting API key",
-      "description": "API key error message"
-  },
-  "usageLimitReached": {
-      "message": "Daily usage limit reached",
-      "description": "Usage limit reached message"
-  },
-  "proFeatureDescription": {
-      "message": "Pro features include unlimited usage and voice synthesis",
-      "description": "Pro features description"
-  },
-  "enterLicenseKey": {
-      "message": "Enter License Key",
-      "description": "License key input placeholder"
-  },
-  "invalidLicenseKey": {
-      "message": "Invalid license key",
-      "description": "Invalid license key message"
-  },
-  "upgradeSuccess": {
-      "message": "Successfully upgraded to Pro version",
-      "description": "Upgrade success message"
-  },
-  "upgradeFailed": {
-      "message": "Failed to upgrade to Pro version",
-      "description": "Upgrade failed message"
-  },
-  "freeDailyLimit": {
-      "message": "Free version: 10 uses per day",
-      "description": "Free version limit description"
-  },
-  "proUnlimited": {
-      "message": "Pro version: Unlimited uses",
-      "description": "Pro version feature description"
   }
 }

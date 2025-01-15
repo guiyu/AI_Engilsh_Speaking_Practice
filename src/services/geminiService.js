@@ -1,6 +1,5 @@
 // src/services/geminiService.js
 import { Logger } from '../utils/logger.js';
-import { LicenseManager } from '../utils/licenseManager.js';  // 添加这行导入语句
 
 export class GeminiService {
     constructor(apiKey) {
@@ -20,26 +19,8 @@ export class GeminiService {
         this.MAX_RETRIES = 3;
     }
 
-     // 新增初始化方法
-     async initialize() {
-        if (!this.initialized) {
-            try {
-                if (!this.apiKey) {
-                    this.apiKey = await LicenseManager.getGeminiKey();
-                }
-                this.initialized = true;
-            } catch (error) {
-                console.error('Failed to initialize GeminiService:', error);
-                throw error;
-            }
-        }
-    }
-
     async initializeChat() {
         try {
-            if (!this.initialized) {
-                await this.initialize();
-            }
             if (!this.apiKey) {
                 throw new Error('未设置API密钥');
             }
@@ -162,29 +143,8 @@ IMPORTANT NOTES:
         }
     }
 
-    async getUserId() {
-        const data = await chrome.storage.local.get(['userId']);
-        if (!data.userId) {
-            const userId = crypto.randomUUID();
-            await chrome.storage.local.set({ userId });
-            return userId;
-        }
-        return data.userId;
-    }
-
     async processAudio(text) {
         try {
-            if (!this.initialized) {
-                await this.initialize();
-            }
-            const userId = await this.getUserId();
-            const { canUse, remainingCount } = await LicenseManager.checkUsageLimit(userId);
-            
-            if (!canUse) {
-                throw new Error(i18n.getMessage('proVersionRequired'));
-            }
-            await LicenseManager.incrementUsage(userId);
-
             const msg = {
                 contents: [
                     {
