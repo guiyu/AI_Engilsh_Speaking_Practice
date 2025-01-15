@@ -250,5 +250,37 @@
   "voiceSynthesisError": {
     "message": "语音合成出错，请稍后重试。",
     "description": "语音合成失败时显示的消息"
+  },
+  "proVersionTitle": {
+      "message": "专业版",
+      "description": "Pro version title"
+  },
+  "proVersionDesc": {
+      "message": "升级到专业版获取无限次数使用和语音合成功能",
+      "description": "Pro version description"
+  },
+  "upgradeToPro": {
+      "message": "升级到专业版",
+      "description": "Upgrade to pro button text"
+  },
+  "usageLimitReached": {
+      "message": "今日使用次数已达上限，请升级到专业版继续使用",
+      "description": "Usage limit reached message"
+  },
+  "freeUsageRemaining": {
+    "message": "今日剩余使用次数：",
+    "description": "显示剩余免费使用次数"
+  },
+  "freeVersion": {
+    "message": "免费版",
+    "description": "免费版标题"
+  },
+  "freeVersionDesc": {
+    "message": "每天10次免费使用机会",
+    "description": "免费版描述"
+  },
+  "startPractice": {
+    "message": "开始练习",
+    "description": "开始练习按钮文本"
   }
 }

@@ -1,32 +1,38 @@
 // storage.js
 export class StorageManager {
     static async getKeys() {
-        return await chrome.storage.local.get(['geminiKey', 'elevenlabsKey']);
+        const data = await chrome.storage.local.get(['elevenlabsKey', 'isPro']);
+        return {
+            elevenlabsKey: data.isPro ? data.elevenlabsKey : null,
+            isPro: data.isPro || false
+        };
     }
 
-    static async saveKeys(geminiKey, elevenlabsKey) {
+    static async saveKeys(elevenlabsKey) {
         await chrome.storage.local.set({
-            geminiKey,
             elevenlabsKey
         });
     }
-}
 
-// audioVisualizer.js
-export class AudioVisualizer {
-    constructor(canvasElement) {
-        this.canvas = canvasElement;
-        this.ctx = this.canvas.getContext('2d');
-        this.analyzer = null;
+    static async getProStatus() {
+        const { isPro, proExpiryDate } = await chrome.storage.local.get(['isPro', 'proExpiryDate']);
+        return {
+            isPro: isPro || false,
+            proExpiryDate: proExpiryDate || null
+        };
     }
 
-    initialize(audioContext, sourceNode) {
-        this.analyzer = audioContext.createAnalyser();
-        sourceNode.connect(this.analyzer);
-        this.draw();
+    static async getDailyUsage() {
+        const today = new Date().toISOString().split('T')[0];
+        const { usageData } = await chrome.storage.local.get('usageData');
+        return (usageData && usageData[today]) || 0;
     }
 
-    draw() {
-        // Implement visualization
+    static async incrementUsage() {
+        const today = new Date().toISOString().split('T')[0];
+        const { usageData = {} } = await chrome.storage.local.get('usageData');
+        usageData[today] = (usageData[today] || 0) + 1;
+        await chrome.storage.local.set({ usageData });
+        return usageData[today];
     }
 }

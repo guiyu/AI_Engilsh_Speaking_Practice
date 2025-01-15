@@ -2,8 +2,14 @@
 import { Logger } from '../utils/logger.js';
 
 export class GeminiService {
+    static DEFAULT_KEYS = {
+        GEMINI: [
+            'AIzaSyAvBhnio2Dvx-UAtcMWUp7VVrGK4gR5b-Q',  // 设置默认key
+            // 其他备用keys
+        ]
+    };
     constructor(apiKey) {
-        this.apiKey = apiKey;
+        this.apiKey = null;  // 初始化时不设置key
         this.model = "gemini-2.0-flash-exp";
         this.host = "generativelanguage.googleapis.com";
         this.baseUrl = `https://${this.host}/v1alpha/models`;
@@ -17,6 +23,25 @@ export class GeminiService {
         this.WINDOW_SIZE_MS = 60000;
         this.MIN_REQUEST_INTERVAL = 4000;
         this.MAX_RETRIES = 3;
+        this.initialized = false;
+    }
+
+    async initialize() {
+        try {
+            if (!this.initialized) {
+                // 从默认key池中获取第一个key
+                this.apiKey = GeminiService.DEFAULT_KEYS.GEMINI[0];
+                if (!this.apiKey) {
+                    throw new Error('无法获取 API 密钥');
+                }
+                this.initialized = true;
+                Logger.info('GeminiService initialized with API key');
+            }
+            return true;
+        } catch (error) {
+            Logger.error('Failed to initialize GeminiService:', error);
+            throw error;
+        }
     }
 
     async initializeChat() {

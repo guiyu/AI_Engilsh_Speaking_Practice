@@ -122,11 +122,10 @@ class PopupManager {
 
     updateSaveButtonState() {
         const saveButton = document.getElementById('save-setup');
-        const geminiKey = document.getElementById('gemini-key')?.value;
-        const micStatus = document.getElementById('mic-status')?.querySelector('.status-text')?.textContent;
-    
         if (saveButton) {
-            saveButton.disabled = !(geminiKey && micStatus === i18n.getMessage('granted'));
+            // 只检查麦克风权限
+            const micStatus = document.getElementById('mic-status')?.querySelector('.status-text')?.textContent;
+            saveButton.disabled = !(micStatus === i18n.getMessage('granted'));
         }
     }
 
@@ -148,26 +147,22 @@ class PopupManager {
         }
     }
 
-    async setupServices(keys) {
-        if (keys.geminiKey) {
-            try {
-                this.geminiService = new GeminiService(keys.geminiKey);
-                // 初始化 WebSocket 服务
-                const wsService = new WebSocketService(keys.geminiKey);
-                wsService.setMessageCallback((response) => {
-                    this.handleWebSocketResponse(response);
-                });
-                await wsService.connect();
-                this.audioService.setWebSocketService(wsService);
-                Logger.info('Services created successfully');
-            } catch (error) {
-                Logger.error('Failed to create services:', error);
-                throw new Error('服务创建失败');
-            }
-        }
+    async setupServices() {
+        try {
+            this.geminiService = new GeminiService();
+            await this.geminiService.initialize();
     
-        if (keys.elevenlabsKey) {
-            this.elevenlabsService = new ElevenlabsService(keys.elevenlabsKey);
+            // 初始化 WebSocket 服务
+            const wsService = new WebSocketService(this.geminiService.apiKey);
+            wsService.setMessageCallback((response) => {
+                this.handleWebSocketResponse(response);
+            });
+            await wsService.connect();
+            this.audioService.setWebSocketService(wsService);
+            Logger.info('Services created successfully');
+        } catch (error) {
+            Logger.error('Failed to create services:', error);
+            throw new Error('服务创建失败');
         }
     }
 
@@ -259,7 +254,8 @@ class PopupManager {
     async initializeAIServices() {
         try {
             if (!this.geminiService) {
-                throw new Error('Gemini服务未正确初始化');
+                this.geminiService = new GeminiService();
+                await this.geminiService.initialize(); // 确保初始化并获取 key
             }
     
             Logger.log('Starting AI service initialization...');
@@ -267,8 +263,7 @@ class PopupManager {
             Logger.info('AI service initialization result:', initialized);
     
             if (!initialized) {
-                Logger.error('AI service initialization returned false');
-                return false;
+                throw new Error('AI 服务初始化失败');
             }
     
             return true;
@@ -357,37 +352,32 @@ class PopupManager {
         }
     }
 
+   // 修改 handleSaveSetup 方法
     async handleSaveSetup() {
         const saveButton = document.getElementById('save-setup');
-        const geminiKey = document.getElementById('gemini-key')?.value;
-        const elevenlabsKey = document.getElementById('elevenlabs-key')?.value;
-    
+        
         try {
-            this.setButtonState(saveButton, 'loading', i18n.getMessage('saving'));
-    
-            if (geminiKey) {
-                await StorageManager.saveKeys(geminiKey, elevenlabsKey);
-                await this.setupServices({ geminiKey, elevenlabsKey });  // 添加 await
-                
-                try {
-                    const initResult = await this.initializeAIServices();
-                    if (!initResult) {
-                        throw new Error('AI init Failed');
-                    }
-                    
-                    this.setButtonState(saveButton, 'success', i18n.getMessage('saveSuccess'));
-                    this.showToast(i18n.getMessage('saveSuccess'));
-                    setTimeout(() => this.showPracticeView(), 1500);
-                } catch (initError) {
-                    throw new Error('AI init Failed: ' + initError.message);
+            this.setButtonState(saveButton, 'loading', i18n.getMessage('preparing'));
+            
+            // 初始化 AI 服务
+            try {
+                const initResult = await this.initializeAIServices();
+                if (!initResult) {
+                    throw new Error('AI 服务初始化失败');
                 }
+                
+                this.setButtonState(saveButton, 'success', i18n.getMessage('ready'));
+                this.showToast(i18n.getMessage('readyToStart'));
+                setTimeout(() => this.showPracticeView(), 1000);
+            } catch (initError) {
+                throw new Error('AI init Failed: ' + initError.message);
             }
         } catch (error) {
-            Logger.error('Save setup error:', error);
-            this.setButtonState(saveButton, 'error', i18n.getMessage('savesaveFailedSuccess'));
+            Logger.error('Setup error:', error);
+            this.setButtonState(saveButton, 'error', i18n.getMessage('startError'));
             this.showToast(error.message, 'error');
             setTimeout(() => {
-                this.setButtonState(saveButton, 'default',i18n.getMessage('saveAndStart'));
+                this.setButtonState(saveButton, 'default', i18n.getMessage('startPractice'));
             }, 2000);
         }
     }

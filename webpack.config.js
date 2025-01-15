@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
@@ -33,10 +34,14 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env.GEMINI_KEYS': JSON.stringify(process.env.GEMINI_KEYS),
+      'process.env.ELEVENLABS_KEYS': JSON.stringify(process.env.ELEVENLABS_KEYS)
+    }),
     new CopyWebpackPlugin({ 
       patterns: [
         { from: 'manifest.json', to: 'manifest.json' },
-        { from: '_locales', to: '_locales' },  // 添加这一行
+        { from: '_locales', to: '_locales' },
         { from: 'assets', to: 'assets' },
         { from: 'src/popup/popup.html', to: 'popup/popup.html' },
         { from: 'src/popup/popup.css', to: 'popup/popup.css' },

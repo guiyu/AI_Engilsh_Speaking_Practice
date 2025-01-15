@@ -250,5 +250,21 @@
   "voiceSynthesisError": {
     "message": "Voice synthesis error. Please try again.",
     "description": "Message shown when voice synthesis fails"
+  },
+  "freeUsageRemaining": {
+    "message": "Remaining uses today: ",
+    "description": "Display remaining free usage count"
+  },
+  "freeVersion": {
+    "message": "Free Version",
+    "description": "Free version title"
+  },
+  "freeVersionDesc": {
+    "message": "10 free uses per day",
+    "description": "Free version description"
+  },
+  "startPractice": {
+    "message": "Start Practice",
+    "description": "Start practice button text"
   }
 }
