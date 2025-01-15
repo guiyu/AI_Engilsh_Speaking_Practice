@@ -9,6 +9,7 @@ import { SpeechRecognition } from '../utils/speechRecognition.js';
 import { WebSocketService } from '../services/websocketService.js'
 import { Logger } from '../utils/logger.js';
 import { i18n } from '../utils/i18n.js';
+import { LicenseManager } from '../utils/licenseManager.js';  // 添加这一行
 
 
 class PopupManager {
@@ -67,7 +68,7 @@ class PopupManager {
     async initializeUI() {
         this.initializeDOMElements();
         await this.checkMicrophonePermission();
-        await this.checkApiKeys();
+        await this.updateAllUsageCounters();  // 添加这行
         this.setupEventListeners();
     }
 
@@ -548,6 +549,12 @@ class PopupManager {
         try {
             if (loadingElement) loadingElement.classList.remove('hidden');
             if (feedbackElement) feedbackElement.classList.add('hidden');
+
+            // 增加使用次数计数
+            await LicenseManager.incrementUsage();
+
+            // 获取并更新所有显示剩余次数的元素
+            await this.updateAllUsageCounters();
             
             const recognizedTextElement = document.getElementById('recognized-text');
             if (recognizedTextElement) {
@@ -596,6 +603,25 @@ class PopupManager {
             if (loadingElement) loadingElement.classList.add('hidden');
             if (feedbackElement) feedbackElement.classList.remove('hidden');
             this.resetRecordingState();
+        }
+    }
+
+    // 添加更新所有使用次数显示的方法
+    async updateAllUsageCounters() {
+        try {
+            const { remainingCount } = await LicenseManager.checkUsageLimit();
+            const counters = [
+                document.getElementById('remaining-count'),
+                document.getElementById('practice-remaining-count')
+            ];
+            
+            counters.forEach(counter => {
+                if (counter) {
+                    counter.textContent = remainingCount >= 0 ? remainingCount.toString() : '∞';
+                }
+            });
+        } catch (error) {
+            Logger.error('Error updating usage counters:', error);
         }
     }
 

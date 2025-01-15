@@ -22,25 +22,42 @@ export class LicenseManager {
     }
 
     static async checkUsageLimit() {
-        const today = new Date().toISOString().split('T')[0];
-        const data = await chrome.storage.local.get(['usage', 'isPro']);
-        const usage = data.usage || {};
-        const userDailyUsage = (usage[today] || 0);
-        
-        return {
-            canUse: data.isPro || userDailyUsage < this.FREE_DAILY_LIMIT,
-            remainingCount: data.isPro ? -1 : (this.FREE_DAILY_LIMIT - userDailyUsage)
-        };
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const data = await chrome.storage.local.get(['usage', 'isPro']);
+            const usage = data.usage || {};
+            const todayUsage = usage[today] || 0;
+            
+            return {
+                canUse: data.isPro || todayUsage < this.FREE_DAILY_LIMIT,
+                remainingCount: data.isPro ? '∞' : (this.FREE_DAILY_LIMIT - todayUsage),
+                isPro: data.isPro || false
+            };
+        } catch (error) {
+            Logger.error('Error checking usage limit:', error);
+            return {
+                canUse: false,
+                remainingCount: 0,
+                isPro: false
+            };
+        }
     }
 
     static async incrementUsage() {
-        const today = new Date().toISOString().split('T')[0];
-        const data = await chrome.storage.local.get(['usage', 'isPro']);
-        if (data.isPro) return true;
-        
-        const usage = data.usage || {};
-        usage[today] = (usage[today] || 0) + 1;
-        await chrome.storage.local.set({ usage });
-        return true;
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const data = await chrome.storage.local.get(['usage', 'isPro']);
+            if (data.isPro) return true;
+            
+            const usage = data.usage || {};
+            if (!usage[today]) usage[today] = 0;
+            usage[today]++;
+            
+            await chrome.storage.local.set({ usage });
+            return true;
+        } catch (error) {
+            Logger.error('Error incrementing usage:', error);
+            return false;
+        }
     }
 }
