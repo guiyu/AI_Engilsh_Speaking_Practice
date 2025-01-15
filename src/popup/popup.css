@@ -283,3 +283,174 @@ h2 {
     background: var(--border);
     margin: 16px 0;
 }
+
+/* 版本对比区域 */
+.version-comparison {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: var(--background);
+    border-radius: 12px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 12px;  /* 与版本卡片对齐 */
+}
+
+.action-buttons .btn.action-main {
+    height: 44px;
+    font-size: 1rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.action-buttons .btn.text {
+    background: none;
+    color: var(--text-secondary);
+    height: 36px;
+    font-size: 0.875rem;
+}
+
+.version-box {
+    flex: 1;
+    min-width: 0;
+}
+
+.version-card {
+    display: flex;
+    flex-direction: column;
+    height: 240px;  /* 固定高度 */
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+}
+
+/* 免费版卡片 */
+.version-card.free {
+    background: white;
+    border: 1px solid var(--border);
+}
+
+/* 专业版卡片 */
+.version-card.pro {
+    background: white;
+    border: 1px solid var(--primary);
+}
+
+
+
+.version-card.pro {
+    border: 1px solid var(--primary);
+}
+
+.version-features {
+    margin: 12px 0;
+}
+
+
+.version-features ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.version-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 0.875rem;
+}
+
+.version-features li .feature-icon {
+    color: var(--primary);
+    font-size: 1rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+.version-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 卡片内部布局 */
+.version-header {
+    margin-bottom: 16px;
+}
+
+
+.version-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--text);
+}
+
+.version-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+
+.version-badge.current {
+    background: var(--secondary);
+    color: white;
+}
+
+.version-badge.recommended {
+    background: var(--primary);
+    color: white;
+}
+
+.version-features {
+    flex-grow: 1;
+}
+
+.version-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.version-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    color: var(--text);
+}
+
+.feature-icon {
+    color: var(--primary);
+    font-size: 1.125rem;
+    width: 20px;
+    text-align: center;
+}
+
+.version-footer {
+    margin-top: auto;  /* 将底部内容推到底部 */
+    padding-top: 16px;
+}
+
+.version-footer .price {
+    display: block;
+    text-align: center;
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+}
+
+.version-footer .btn {
+    margin-top: 8px;
+}
+
+.setup-main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

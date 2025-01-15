@@ -33,42 +33,81 @@
                     </button>
                 </div>
 
-                <!-- 版本信息部分 -->
-                <div class="version-section">
-                    <div class="version-card free">
-                        <div class="version-header">
-                            <h3 data-i18n="freeVersion">免费版</h3>
-                            <span class="version-badge">当前</span>
-                        </div>
-                        <p data-i18n="freeVersionDesc">每天10次免费使用机会</p>
-                    </div>
+                    <!-- 操作按钮组 -->
+                <div class="action-buttons">
+                    <button id="save-setup" class="btn primary action-main">
+                        <span class="icon">🎯</span>
+                        <span data-i18n="startPractice">开始练习</span>
+                    </button>
                     
-                    <div class="version-card pro">
-                        <div class="version-header">
-                            <h3 data-i18n="proVersion">专业版</h3>
-                            <span class="version-badge pro">推荐</span>
-                        </div>
-                        <p data-i18n="proVersionDesc">无限次使用 + AI语音合成</p>
-                        <button id="upgrade-btn" class="btn primary full-width">
-                            <span class="icon">⭐</span>
-                            <span data-i18n="upgradeToPro">升级到专业版</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 开始练习按钮 -->
-                <button id="save-setup" class="btn primary highlight full-width">
-                    <span class="icon">🎯</span>
-                    <span data-i18n="startPractice">开始练习</span>
-                </button>
-
-                <!-- 反馈部分 -->
-                <div class="feedback-section">
-                    <button id="feedback-btn" class="btn text-only">
+                    <button id="feedback-btn" class="btn text">
                         <span class="feedback-icon">💡</span>
-                        <span data-i18n="sendFeedback">反馈建议</span>
+                        <span data-i18n="sendFeedback">发送反馈</span>
                     </button>
                 </div>
+
+                <div class="version-comparison">
+                    <div class="version-box">
+                        <div class="version-card free">
+                            <div class="version-header">
+                                <h3 data-i18n="freeVersion">免费版</h3>
+                                <span class="version-badge current">当前</span>
+                            </div>
+                            <div class="version-features">
+                                <ul>
+                                    <li>
+                                        <span class="feature-icon">✓</span>
+                                        <span data-i18n="freeVersionDesc">每天10次免费使用机会</span>
+                                    </li>
+                                    <li>
+                                        <span class="feature-icon">✓</span>
+                                        基础语音识别
+                                    </li>
+                                    <li>
+                                        <span class="feature-icon">✓</span>
+                                        AI语法分析
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="version-footer">
+                                <span class="price">免费使用</span>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="version-box">
+                        <div class="version-card pro">
+                            <div class="version-header">
+                                <h3 data-i18n="proVersion">专业版</h3>
+                                <span class="version-badge recommended">推荐</span>
+                            </div>
+                            <div class="version-features">
+                                <ul>
+                                    <li>
+                                        <span class="feature-icon">✓</span>
+                                        <span data-i18n="proVersionDesc">无限次使用</span>
+                                    </li>
+                                    <li>
+                                        <span class="feature-icon">✓</span>
+                                        AI语音合成
+                                    </li>
+                                    <li>
+                                        <span class="feature-icon">✓</span>
+                                        高级语音分析
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="version-footer">
+                                <button id="upgrade-btn" class="btn primary full-width">
+                                    <span class="icon">⭐</span>
+                                    <span data-i18n="upgradeToPro">升级到专业版</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
 
