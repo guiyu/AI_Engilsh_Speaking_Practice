@@ -342,5 +342,33 @@
   "micPermissionStillDenied": {
     "message": "麦克风权限仍未开启，请检查浏览器设置",
     "description": "权限仍未开启提示"
+  },
+  "basicSpeechRecognition": {
+    "message": "基础语音识别",
+    "description": "免费版功能-基础语音识别"
+  },
+  "basicGrammarAnalysis": {
+    "message": "AI语法分析",
+    "description": "免费版功能-AI语法分析"
+  },
+  "aiVoiceSynthesis": {
+    "message": "AI语音合成",
+    "description": "专业版功能-AI语音合成"
+  },
+  "advancedAnalysis": {
+    "message": "高级语音分析",
+    "description": "专业版功能-高级语音分析"
+  },
+  "currentBadge": {
+    "message": "当前",
+    "description": "当前版本标签"
+  },
+  "recommendedBadge": {
+    "message": "推荐",
+    "description": "推荐版本标签"
+  },
+  "freeUse": {
+    "message": "免费使用",
+    "description": "免费使用标签"
   }
 }

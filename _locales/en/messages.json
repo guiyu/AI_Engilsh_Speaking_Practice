@@ -330,5 +330,33 @@
   "micPermissionStillDenied": {
     "message": "Microphone permission is still denied. Please check your browser settings.",
     "description": "Permission still denied message"
+  },
+  "basicSpeechRecognition": {
+    "message": "Basic Speech Recognition",
+    "description": "Free version feature"
+  },
+  "aiGrammarAnalysis": {
+    "message": "AI Grammar Analysis",
+    "description": "Free version feature"
+  },
+  "aiVoiceSynthesis": {
+    "message": "AI Voice Synthesis",
+    "description": "Pro version feature"
+  },
+  "advancedSpeechAnalysis": {
+    "message": "Advanced Speech Analysis",
+    "description": "Pro version feature"
+  },
+  "currentBadge": {
+    "message": "Current",
+    "description": "Current version badge"
+  },
+  "recommendedBadge": {
+    "message": "Recommended",
+    "description": "Recommended version badge"
+  },
+  "freeUse": {
+    "message": "Free",
+    "description": "Free Use"
   }
 }
