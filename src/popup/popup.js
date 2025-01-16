@@ -302,6 +302,26 @@ class PopupManager {
         if (this.setupView && this.practiceView) {
             this.setupView.classList.remove('hidden');
             this.practiceView.classList.add('hidden');
+            
+            // 重置开始练习按钮
+            const startButton = document.getElementById('save-setup');
+            if (startButton) {
+                // 清除所有可能的状态类
+                startButton.classList.remove('loading', 'success', 'error');
+                // 添加正确的类
+                startButton.classList.add('btn', 'primary', 'action-main');
+                // 重置为可用状态
+                startButton.disabled = false;
+                
+                // 重置按钮内容为默认结构
+                startButton.innerHTML = `
+                    <span class="icon">🎯</span>
+                    <span data-i18n="startPractice">开始练习</span>
+                `;
+            }
+    
+            // 重新初始化国际化
+            i18n.initializeI18n();
         }
     }
 
