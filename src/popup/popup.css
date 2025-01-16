@@ -153,15 +153,42 @@ h2 {
 }
 
 .version-card {
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    position: relative;
+    min-height: 220px;  /* 确保卡片有固定最小高度 */
     padding: 16px;
-    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
 }
 
 .version-card.pro {
-    border-color: var(--primary);
-    background: rgba(37, 99, 235, 0.05);
+    padding-bottom: 60px; /* 为按钮预留空间 */
+}
+
+/* 修改升级按钮样式 */
+#upgrade-btn {
+    width: 100%;
+    height: 36px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 6px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#upgrade-btn:hover {
+    background: var(--primary-hover);
+}
+
+#upgrade-btn .icon {
+    font-size: 14px;
 }
 
 .version-header {
@@ -376,12 +403,11 @@ h2 {
 }
 
 .version-card {
+    position: relative;
     display: flex;
     flex-direction: column;
-    height: 240px;  /* 固定高度 */
+    height: 220px; /* 固定高度，确保两边对齐 */
     padding: 16px;
-    background: white;
-    border-radius: 8px;
 }
 
 /* 免费版卡片 */
@@ -397,13 +423,13 @@ h2 {
 }
 
 
-
 .version-card.pro {
     border: 1px solid var(--primary);
+    overflow: visible; /* 允许按钮在边框内显示 */
 }
 
 .version-features {
-    margin: 12px 0;
+    flex: 1;
 }
 
 
@@ -488,17 +514,17 @@ h2 {
 }
 
 .version-footer {
-    margin-top: auto;  /* 将底部内容推到底部 */
-    padding-top: 16px;
+    margin-top: auto;
+    height: 36px; /* 固定高度确保对齐 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .version-footer .price {
-    display: block;
-    text-align: center;
-    font-size: 1.125rem;
     color: var(--text-secondary);
+    font-size: 0.875rem;
 }
-
 .version-footer .btn {
     margin-top: 8px;
 }
