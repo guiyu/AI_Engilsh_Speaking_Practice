@@ -270,5 +270,65 @@
   "proVersion": {
     "message": "Pro Version",
     "description": "Pro version title"
+  },
+  "micPermissionGuide": {
+    "message": "Microphone Permission Setup Guide",
+    "description": "Permission setup guide page title"
+  },
+  "step1Title": {
+    "message": "Open Chrome Extensions",
+    "description": "Step 1 title"
+  },
+  "step1Desc": {
+    "message": "Type in browser address bar: chrome://extensions/",
+    "description": "Step 1 description"
+  },
+  "step2Title": {
+    "message": "Find AI English Practice",
+    "description": "Step 2 title"
+  },
+  "step2Desc": {
+    "message": "Locate this extension in the list",
+    "description": "Step 2 description"
+  },
+  "step3Title": {
+    "message": "Click Details",
+    "description": "Step 3 title"
+  },
+  "step3Desc": {
+    "message": "Click the 'Details' button in the bottom right of the extension card",
+    "description": "Step 3 description"
+  },
+  "step4Title": {
+    "message": "Click Site Settings",
+    "description": "Step 4 title"
+  },
+  "step4Desc": {
+    "message": "Find and click 'Site Settings' option in the extension details page",
+    "description": "Step 4 description"
+  },
+  "step5Title": {
+    "message": "Enable Microphone Permission",
+    "description": "Step 5 title"
+  },
+  "step5Desc": {
+    "message": "In Site Settings, locate 'Microphone' permission and set it to 'Allow'",
+    "description": "Step 5 description"
+  },
+  "checkAgain": {
+    "message": "Check Permission Again",
+    "description": "Check permission again button text"
+  },
+  "copyAddress": {
+    "message": "Copy",
+    "description": "Copy address button text"
+  },
+  "addressCopied": {
+    "message": "Copied",
+    "description": "Address copied success message"
+  },
+  "micPermissionStillDenied": {
+    "message": "Microphone permission is still denied. Please check your browser settings.",
+    "description": "Permission still denied message"
   }
 }

@@ -23,6 +23,10 @@
       "src/pages/feedback/feedback.html",
       "src/pages/feedback/feedback.css",
       "src/pages/feedback/feedback.js",
+      "src/pages/permission-guide/guide.html",
+      "src/pages/permission-guide/guide.css",
+      "src/pages/permission-guide/guide.js",
+      "assets/images/guide/*",
       "assets/icons/*"
     ],
     "matches": ["<all_urls>"]

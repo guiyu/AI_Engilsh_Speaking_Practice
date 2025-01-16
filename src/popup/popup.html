@@ -20,17 +20,21 @@
             <div class="setup-content">
                 <!-- 麦克风权限检查 -->
                 <div class="permission-section">
-                    <div class="permission-header">
-                        <h3 data-i18n="micPermission">麦克风权限</h3>
-                        <div id="mic-status" class="status-indicator">
-                            <span class="status-icon">⚪</span>
-                            <span class="status-text" data-i18n="unchecked">未检查</span>
+                    <div class="permission-content">
+                        <div class="permission-row">
+                            <h3 data-i18n="micPermission">麦克风权限</h3>
+                            <div id="mic-status" class="status-indicator">
+                                <span class="status-badge granted">
+                                    <span class="icon">✓</span>
+                                    <span class="status-text" data-i18n="granted">已授权</span>
+                                </span>
+                            </div>
                         </div>
+                        <button id="check-mic" class="btn primary-outline">
+                            <span class="icon">🎤</span>
+                            <span data-i18n="checkMicPermission">检查麦克风权限</span>
+                        </button>
                     </div>
-                    <button id="check-mic" class="btn secondary compact">
-                        <span class="icon">🎤</span>
-                        <span data-i18n="checkMicPermission">检查麦克风权限</span>
-                    </button>
                 </div>
 
                     <!-- 操作按钮组 -->

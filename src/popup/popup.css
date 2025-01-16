@@ -71,9 +71,28 @@ h2 {
 /* 权限区域 */
 .permission-section {
     background: var(--background);
-    padding: 12px;
     border-radius: 8px;
+    padding: 12px 16px;
     margin-bottom: 16px;
+}
+
+.permission-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.permission-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.permission-row h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text);
 }
 
 .permission-header {
@@ -86,8 +105,43 @@ h2 {
 .status-indicator {
     display: flex;
     align-items: center;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
     gap: 4px;
+    padding: 4px 8px;
+    border-radius: 16px;
     font-size: 0.875rem;
+    background: var(--background);
+}
+
+.status-badge.granted {
+    background: #ecfdf5;  /* 浅绿色背景 */
+    color: #059669;  /* 深绿色文字 */
+}
+
+.status-badge .icon {
+    font-size: 0.875rem;
+}
+
+.btn.primary-outline {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    height: 36px;
+}
+
+.btn.primary-outline:hover {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+#mic-status .status-text {
+    font-weight: 500;
 }
 
 /* 版本卡片 */

@@ -78,34 +78,37 @@ class PopupManager {
         const statusText = micStatus?.querySelector('.status-text');
     
         try {
-            // 首先尝试获取媒体设备权限
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    sampleRate: 48000
-                }
-            });
-            // 立即停止流，以释放麦克风
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             stream.getTracks().forEach(track => track.stop());
-            // 然后再查询权限状态
+    
             const permissionResult = await navigator.permissions.query({ name: 'microphone' });
             
             if (permissionResult.state === 'granted') {
-                if (statusIcon) statusIcon.textContent = '✅';
+                if (statusIcon) statusIcon.textContent = '✓';
                 if (statusText) statusText.textContent = i18n.getMessage('granted');
                 this.updateSaveButtonState();
                 return true;
             } else {
                 if (statusIcon) statusIcon.textContent = '⚠️';
                 if (statusText) statusText.textContent = i18n.getMessage('denied');
-                document.getElementById('check-mic')?.classList.remove('hidden');
+                
+                // 打开权限指导页面
+                chrome.tabs.create({
+                    url: chrome.runtime.getURL('src/pages/permission-guide/guide.html')
+                });
+                
                 return false;
             }
         } catch (error) {
             Logger.error('Permission check failed:', error);
             if (statusIcon) statusIcon.textContent = '❌';
             if (statusText) statusText.textContent = i18n.getMessage('checkFailed');
+            
+            // 打开权限指导页面
+            chrome.tabs.create({
+                url: chrome.runtime.getURL('src/pages/permission-guide/guide.html')
+            });
+            
             return false;
         }
     }
