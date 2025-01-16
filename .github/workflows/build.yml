@@ -11,7 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+      GEMINI_KEYS: ${{ secrets.GEMINI_KEYS }}
+      ELEVENLABS_KEYS: ${{ secrets.ELEVENLABS_KEYS }}
     steps:
     - uses: actions/checkout@v3
 

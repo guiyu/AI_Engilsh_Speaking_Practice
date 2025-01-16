@@ -16,7 +16,7 @@
 body {
     width: 480px;
     margin: 0;
-    padding: 20px;
+    padding: 16px;
     font-family: -apple-system, system-ui, sans-serif;
     background: var(--background);
     color: var(--text);
@@ -25,66 +25,176 @@ body {
 .container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
 }
 
 .view {
     background: var(--surface);
     border-radius: 12px;
-    padding: 24px;
+    padding: 20px;
     box-shadow: var(--shadow);
 }
 
-.hidden {
-    display: none !important;
+/* 头部样式 */
+.setup-header, .practice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-/* 头部样式 */
 h2 {
-    margin: 0 0 20px 0;
-    font-size: 1.5em;
+    margin: 0;
+    font-size: 1.25rem;
     color: var(--text);
 }
 
-/* 表单样式 */
-.form-group {
+/* 使用次数徽章 */
+.usage-badge {
+    background: var(--background);
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.count-badge {
+    background: var(--primary);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+/* 权限区域 */
+.permission-section {
+    background: var(--background);
+    border-radius: 8px;
+    padding: 12px 16px;
     margin-bottom: 16px;
 }
 
-label {
-    display: block;
-    margin-bottom: 8px;
+.permission-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.permission-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.permission-row h3 {
+    margin: 0;
+    font-size: 0.95rem;
     font-weight: 500;
     color: var(--text);
 }
 
-input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 14px;
-    box-sizing: border-box;
+.permission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
-.hint {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 4px;
+.status-indicator {
+    display: flex;
+    align-items: center;
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 0.875rem;
+    background: var(--background);
+}
+
+.status-badge.granted {
+    background: #ecfdf5;  /* 浅绿色背景 */
+    color: #059669;  /* 深绿色文字 */
+}
+
+.status-badge .icon {
+    font-size: 0.875rem;
+}
+
+.btn.primary-outline {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    height: 36px;
+}
+
+.btn.primary-outline:hover {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+#mic-status .status-text {
+    font-weight: 500;
+}
+
+/* 版本卡片 */
+.version-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.version-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s;
+}
+
+.version-card.pro {
+    border-color: var(--primary);
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.version-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.version-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: var(--secondary);
+    color: white;
+}
+
+.version-badge.pro {
+    background: var(--primary);
 }
 
 /* 按钮样式 */
 .btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .btn.primary {
@@ -97,19 +207,37 @@ input {
 }
 
 .btn.secondary {
-    background: var(--surface);
+    background: var(--background);
     color: var(--text);
-    border: 1px solid var(--border);
 }
 
 .btn.secondary:hover {
-    background: var(--background);
+    background: var(--border);
 }
 
-/* 检查麦克风按钮样式 */
-#check-mic {
-    margin: 12px 0;
-    width: auto;
+.btn.compact {
+    padding: 4px 12px;
+    font-size: 0.875rem;
+}
+
+.btn.large {
+    padding: 12px 24px;
+    font-size: 1rem;
+}
+
+.btn.full-width {
+    width: 100%;
+}
+
+.btn.text-only {
+    background: none;
+    padding: 4px;
+    color: var(--text-secondary);
+}
+
+.btn.icon-only {
+    padding: 8px;
+    border-radius: 50%;
 }
 
 .btn:disabled {
@@ -117,28 +245,12 @@ input {
     cursor: not-allowed;
 }
 
-.btn.small {
-    padding: 4px 8px;
-    font-size: 12px;
-}
-
-/* 权限视图样式 */
-.permission-content {
-    text-align: center;
-    padding: 20px;
-}
-
-.app-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 20px;
-}
-
-/* 录音区域样式 */
+/* 录音区域 */
 .recording-section {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin: 20px 0;
 }
 
 .audio-visualizer {
@@ -154,19 +266,56 @@ input {
     justify-content: center;
 }
 
-/* 加载状态样式 */
-.loading-section {
+/* AI 反馈区域 */
+.feedback-card {
+    background: var(--background);
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 16px;
+}
+
+.feedback-card > div {
+    margin-bottom: 16px;
+}
+
+.feedback-card .label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.feedback-card .content {
+    margin: 0;
+    padding: 12px;
+    background: var(--surface);
+    border-radius: 6px;
+}
+
+.highlight {
+    color: var(--primary);
+    font-weight: 500;
+}
+
+/* 加载遮罩 */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    margin: 20px 0;
 }
 
 .spinner {
     width: 24px;
     height: 24px;
-    border: 3px solid var(--border);
+    border: 3px solid var(--background);
     border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -178,197 +327,184 @@ input {
     }
 }
 
-/* 反馈区域样式 */
-.feedback-section {
-    margin-top: 24px;
+.hidden {
+    display: none !important;
 }
 
-.feedback-section h3 {
-    font-size: 16px;
-    margin: 16px 0 8px;
-    color: var(--text);
-}
-
-.recognized-speech {
-    background: var(--background);
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 16px;
-}
-
-#recognized-text {
-    margin: 0;
-    font-style: italic;
-    color: var(--text-secondary);
-}
-
-.feedback-item {
-    margin-bottom: 12px;
-}
-
-.feedback-item strong {
-    color: var(--primary);
-}
-
-.next-practice {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-}
-
-/* 练习视图头部 */
-.practice-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-/* 在现有的 popup.css 中添加以下样式 */
-
-/* 按钮动画效果 */
-.btn {
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.btn:active {
-    transform: scale(0.95);
-}
-
-.btn.loading {
-    pointer-events: none;
-    opacity: 0.7;
-}
-
-.btn.loading::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    top: 50%;
-    left: 50%;
-    margin: -10px 0 0 -10px;
-    border: 2px solid transparent;
-    border-top-color: currentColor;
-    border-radius: 50%;
-    animation: button-loading-spinner 0.6s linear infinite;
-}
-
-@keyframes button-loading-spinner {
-    from {
-        transform: rotate(0turn);
-    }
-    to {
-        transform: rotate(1turn);
-    }
-}
-
-/* 成功状态样式 */
-.btn.success {
-    background-color: var(--success) !important;
-    color: white !important;
-}
-
-/* 错误状态样式 */
-.btn.error {
-    background-color: var(--error) !important;
-    color: white !important;
-}
-
-/* 状态图标 */
-.status-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
-}
-
-/* Toast消息样式 */
-.toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 12px 24px;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    border-radius: 4px;
-    z-index: 1000;
-    animation: toast-in 0.3s ease forwards;
-}
-
-@keyframes toast-in {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* 保存设置按钮特殊样式 */
-#save-setup.saving {
-    position: relative;
-    padding-right: 40px;
-}
-
-#save-setup.saving::after {
-    right: 10px;
-    margin: -10px 0 0 0;
-}
-
-/* 添加到文件末尾 */
+/* 分割线 */
 .divider {
     height: 1px;
     background: var(--border);
-    margin: 20px 0;
+    margin: 16px 0;
 }
 
-.feedback-section {
-    margin-top: 16px;
-}
-
-.feedback-section h3 {
-    font-size: 14px;
-    margin-bottom: 12px;
-    color: var(--text);
-}
-
-/* 修改反馈按钮样式 */
-#feedback-btn {
-    width: 100%;
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: 10px;
-    margin: 8px 0;
-}
-
-#feedback-btn:hover {
+/* 版本对比区域 */
+.version-comparison {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
     background: var(--background);
+    border-radius: 12px;
 }
 
-/* 保存按钮样式 */
-#save-setup {
-    margin-top: 24px;
-    width: 100%;
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 12px;  /* 与版本卡片对齐 */
 }
 
-.feedback-icon {
-    font-size: 16px;
+.action-buttons .btn.action-main {
+    height: 44px;
+    font-size: 1rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
-/* 稍微调整练习视图的内边距，确保整体布局协调 */
-#practice-view {
-    padding-top: 20px;
+.action-buttons .btn.text {
+    background: none;
+    color: var(--text-secondary);
+    height: 36px;
+    font-size: 0.875rem;
 }
 
-/* 调整练习标题的外边距 */
-.practice-header {
-    margin-top: 0;
+.version-box {
+    flex: 1;
+    min-width: 0;
+}
+
+.version-card {
+    display: flex;
+    flex-direction: column;
+    height: 240px;  /* 固定高度 */
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+}
+
+/* 免费版卡片 */
+.version-card.free {
+    background: white;
+    border: 1px solid var(--border);
+}
+
+/* 专业版卡片 */
+.version-card.pro {
+    background: white;
+    border: 1px solid var(--primary);
+}
+
+
+
+.version-card.pro {
+    border: 1px solid var(--primary);
+}
+
+.version-features {
+    margin: 12px 0;
+}
+
+
+.version-features ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.version-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 0.875rem;
+}
+
+.version-features li .feature-icon {
+    color: var(--primary);
+    font-size: 1rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+.version-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 卡片内部布局 */
+.version-header {
+    margin-bottom: 16px;
+}
+
+
+.version-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--text);
+}
+
+.version-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+
+.version-badge.current {
+    background: var(--secondary);
+    color: white;
+}
+
+.version-badge.recommended {
+    background: var(--primary);
+    color: white;
+}
+
+.version-features {
+    flex-grow: 1;
+}
+
+.version-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.version-features li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    color: var(--text);
+}
+
+.feature-icon {
+    color: var(--primary);
+    font-size: 1.125rem;
+    width: 20px;
+    text-align: center;
+}
+
+.version-footer {
+    margin-top: auto;  /* 将底部内容推到底部 */
+    padding-top: 16px;
+}
+
+.version-footer .price {
+    display: block;
+    text-align: center;
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+}
+
+.version-footer .btn {
+    margin-top: 8px;
+}
+
+.setup-main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }

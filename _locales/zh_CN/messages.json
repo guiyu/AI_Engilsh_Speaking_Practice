@@ -250,5 +250,125 @@
   "voiceSynthesisError": {
     "message": "语音合成出错，请稍后重试。",
     "description": "语音合成失败时显示的消息"
+  },
+  "proVersion": {
+      "message": "专业版",
+      "description": "Pro version title"
+  },
+  "proVersionDesc": {
+      "message": "升级到专业版获取无限次数使用和语音合成功能",
+      "description": "Pro version description"
+  },
+  "upgradeToPro": {
+      "message": "升级到专业版",
+      "description": "Upgrade to pro button text"
+  },
+  "usageLimitReached": {
+      "message": "今日使用次数已达上限，请升级到专业版继续使用",
+      "description": "Usage limit reached message"
+  },
+  "freeUsageRemaining": {
+    "message": "今日剩余使用次数：",
+    "description": "显示剩余免费使用次数"
+  },
+  "freeVersion": {
+    "message": "免费版",
+    "description": "免费版标题"
+  },
+  "freeVersionDesc": {
+    "message": "每天10次免费使用机会",
+    "description": "免费版描述"
+  },
+  "startPractice": {
+    "message": "开始练习",
+    "description": "开始练习按钮文本"
+  },
+  "micPermissionGuide": {
+    "message": "麦克风权限设置指南",
+    "description": "权限设置指南页面标题"
+  },
+  "step1Title": {
+    "message": "打开 Chrome 扩展设置",
+    "description": "步骤1标题"
+  },
+  "step1Desc": {
+    "message": "在浏览器地址栏输入: chrome://extensions/",
+    "description": "步骤1描述"
+  },
+  "step2Title": {
+    "message": "找到 AI English Practice",
+    "description": "步骤2标题"
+  },
+  "step2Desc": {
+    "message": "在扩展列表中找到本扩展",
+    "description": "步骤2描述"
+  },
+  "step3Title": {
+    "message": "点击详情",
+    "description": "步骤3标题"
+  },
+  "step3Desc": {
+    "message": "点击扩展卡片右下角的“详情”按钮",
+    "description": "步骤3描述"
+  },
+  "step4Title": {
+    "message": "点击站点设置",
+    "description": "步骤4标题"
+  },
+  "step4Desc": {
+    "message": "在扩展详情页面找到并点击“站点设置”选项",
+    "description": "步骤4描述"
+  },
+  "step5Title": {
+    "message": "开启麦克风权限",
+    "description": "步骤5标题"
+  },
+  "step5Desc": {
+    "message": "在站点设置中找到“麦克风”权限，将其设置为“允许”",
+    "description": "步骤5描述"
+  },
+  "checkAgain": {
+    "message": "重新检查权限",
+    "description": "重新检查权限按钮文本"
+  },
+  "copyAddress": {
+    "message": "复制地址",
+    "description": "复制地址按钮文本"
+  },
+  "addressCopied": {
+    "message": "已复制",
+    "description": "地址复制成功提示"
+  },
+  "micPermissionStillDenied": {
+    "message": "麦克风权限仍未开启，请检查浏览器设置",
+    "description": "权限仍未开启提示"
+  },
+  "basicSpeechRecognition": {
+    "message": "基础语音识别",
+    "description": "免费版功能-基础语音识别"
+  },
+  "basicGrammarAnalysis": {
+    "message": "AI语法分析",
+    "description": "免费版功能-AI语法分析"
+  },
+  "aiVoiceSynthesis": {
+    "message": "AI语音合成",
+    "description": "专业版功能-AI语音合成"
+  },
+  "advancedAnalysis": {
+    "message": "高级语音分析",
+    "description": "专业版功能-高级语音分析"
+  },
+  "currentBadge": {
+    "message": "当前",
+    "description": "当前版本标签"
+  },
+  "recommendedBadge": {
+    "message": "推荐",
+    "description": "推荐版本标签"
+  },
+  "freeUse": {
+    "message": "免费使用",
+    "description": "免费使用标签"
   }
 }

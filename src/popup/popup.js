@@ -9,6 +9,7 @@ import { SpeechRecognition } from '../utils/speechRecognition.js';
 import { WebSocketService } from '../services/websocketService.js'
 import { Logger } from '../utils/logger.js';
 import { i18n } from '../utils/i18n.js';
+import { LicenseManager } from '../utils/licenseManager.js';  // 添加这一行
 
 
 class PopupManager {
@@ -67,7 +68,7 @@ class PopupManager {
     async initializeUI() {
         this.initializeDOMElements();
         await this.checkMicrophonePermission();
-        await this.checkApiKeys();
+        await this.updateAllUsageCounters();  // 添加这行
         this.setupEventListeners();
     }
 
@@ -77,34 +78,37 @@ class PopupManager {
         const statusText = micStatus?.querySelector('.status-text');
     
         try {
-            // 首先尝试获取媒体设备权限
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    sampleRate: 48000
-                }
-            });
-            // 立即停止流，以释放麦克风
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             stream.getTracks().forEach(track => track.stop());
-            // 然后再查询权限状态
+    
             const permissionResult = await navigator.permissions.query({ name: 'microphone' });
             
             if (permissionResult.state === 'granted') {
-                if (statusIcon) statusIcon.textContent = '✅';
+                if (statusIcon) statusIcon.textContent = '✓';
                 if (statusText) statusText.textContent = i18n.getMessage('granted');
                 this.updateSaveButtonState();
                 return true;
             } else {
                 if (statusIcon) statusIcon.textContent = '⚠️';
                 if (statusText) statusText.textContent = i18n.getMessage('denied');
-                document.getElementById('check-mic')?.classList.remove('hidden');
+                
+                // 打开权限指导页面
+                chrome.tabs.create({
+                    url: chrome.runtime.getURL('src/pages/permission-guide/guide.html')
+                });
+                
                 return false;
             }
         } catch (error) {
             Logger.error('Permission check failed:', error);
             if (statusIcon) statusIcon.textContent = '❌';
             if (statusText) statusText.textContent = i18n.getMessage('checkFailed');
+            
+            // 打开权限指导页面
+            chrome.tabs.create({
+                url: chrome.runtime.getURL('src/pages/permission-guide/guide.html')
+            });
+            
             return false;
         }
     }
@@ -122,11 +126,10 @@ class PopupManager {
 
     updateSaveButtonState() {
         const saveButton = document.getElementById('save-setup');
-        const geminiKey = document.getElementById('gemini-key')?.value;
-        const micStatus = document.getElementById('mic-status')?.querySelector('.status-text')?.textContent;
-    
         if (saveButton) {
-            saveButton.disabled = !(geminiKey && micStatus === i18n.getMessage('granted'));
+            // 只检查麦克风权限
+            const micStatus = document.getElementById('mic-status')?.querySelector('.status-text')?.textContent;
+            saveButton.disabled = !(micStatus === i18n.getMessage('granted'));
         }
     }
 
@@ -148,26 +151,22 @@ class PopupManager {
         }
     }
 
-    async setupServices(keys) {
-        if (keys.geminiKey) {
-            try {
-                this.geminiService = new GeminiService(keys.geminiKey);
-                // 初始化 WebSocket 服务
-                const wsService = new WebSocketService(keys.geminiKey);
-                wsService.setMessageCallback((response) => {
-                    this.handleWebSocketResponse(response);
-                });
-                await wsService.connect();
-                this.audioService.setWebSocketService(wsService);
-                Logger.info('Services created successfully');
-            } catch (error) {
-                Logger.error('Failed to create services:', error);
-                throw new Error('服务创建失败');
-            }
-        }
+    async setupServices() {
+        try {
+            this.geminiService = new GeminiService();
+            await this.geminiService.initialize();
     
-        if (keys.elevenlabsKey) {
-            this.elevenlabsService = new ElevenlabsService(keys.elevenlabsKey);
+            // 初始化 WebSocket 服务
+            const wsService = new WebSocketService(this.geminiService.apiKey);
+            wsService.setMessageCallback((response) => {
+                this.handleWebSocketResponse(response);
+            });
+            await wsService.connect();
+            this.audioService.setWebSocketService(wsService);
+            Logger.info('Services created successfully');
+        } catch (error) {
+            Logger.error('Failed to create services:', error);
+            throw new Error('服务创建失败');
         }
     }
 
@@ -259,7 +258,8 @@ class PopupManager {
     async initializeAIServices() {
         try {
             if (!this.geminiService) {
-                throw new Error('Gemini服务未正确初始化');
+                this.geminiService = new GeminiService();
+                await this.geminiService.initialize(); // 确保初始化并获取 key
             }
     
             Logger.log('Starting AI service initialization...');
@@ -267,8 +267,7 @@ class PopupManager {
             Logger.info('AI service initialization result:', initialized);
     
             if (!initialized) {
-                Logger.error('AI service initialization returned false');
-                return false;
+                throw new Error('AI 服务初始化失败');
             }
     
             return true;
@@ -303,6 +302,26 @@ class PopupManager {
         if (this.setupView && this.practiceView) {
             this.setupView.classList.remove('hidden');
             this.practiceView.classList.add('hidden');
+            
+            // 重置开始练习按钮
+            const startButton = document.getElementById('save-setup');
+            if (startButton) {
+                // 清除所有可能的状态类
+                startButton.classList.remove('loading', 'success', 'error');
+                // 添加正确的类
+                startButton.classList.add('btn', 'primary', 'action-main');
+                // 重置为可用状态
+                startButton.disabled = false;
+                
+                // 重置按钮内容为默认结构
+                startButton.innerHTML = `
+                    <span class="icon">🎯</span>
+                    <span data-i18n="startPractice">开始练习</span>
+                `;
+            }
+    
+            // 重新初始化国际化
+            i18n.initializeI18n();
         }
     }
 
@@ -357,37 +376,32 @@ class PopupManager {
         }
     }
 
+   // 修改 handleSaveSetup 方法
     async handleSaveSetup() {
         const saveButton = document.getElementById('save-setup');
-        const geminiKey = document.getElementById('gemini-key')?.value;
-        const elevenlabsKey = document.getElementById('elevenlabs-key')?.value;
-    
+        
         try {
-            this.setButtonState(saveButton, 'loading', i18n.getMessage('saving'));
-    
-            if (geminiKey) {
-                await StorageManager.saveKeys(geminiKey, elevenlabsKey);
-                await this.setupServices({ geminiKey, elevenlabsKey });  // 添加 await
-                
-                try {
-                    const initResult = await this.initializeAIServices();
-                    if (!initResult) {
-                        throw new Error('AI init Failed');
-                    }
-                    
-                    this.setButtonState(saveButton, 'success', i18n.getMessage('saveSuccess'));
-                    this.showToast(i18n.getMessage('saveSuccess'));
-                    setTimeout(() => this.showPracticeView(), 1500);
-                } catch (initError) {
-                    throw new Error('AI init Failed: ' + initError.message);
+            this.setButtonState(saveButton, 'loading', i18n.getMessage('preparing'));
+            
+            // 初始化 AI 服务
+            try {
+                const initResult = await this.initializeAIServices();
+                if (!initResult) {
+                    throw new Error('AI 服务初始化失败');
                 }
+                
+                this.setButtonState(saveButton, 'success', i18n.getMessage('ready'));
+                this.showToast(i18n.getMessage('readyToStart'));
+                setTimeout(() => this.showPracticeView(), 1000);
+            } catch (initError) {
+                throw new Error('AI init Failed: ' + initError.message);
             }
         } catch (error) {
-            Logger.error('Save setup error:', error);
-            this.setButtonState(saveButton, 'error', i18n.getMessage('savesaveFailedSuccess'));
+            Logger.error('Setup error:', error);
+            this.setButtonState(saveButton, 'error', i18n.getMessage('startError'));
             this.showToast(error.message, 'error');
             setTimeout(() => {
-                this.setButtonState(saveButton, 'default',i18n.getMessage('saveAndStart'));
+                this.setButtonState(saveButton, 'default', i18n.getMessage('startPractice'));
             }, 2000);
         }
     }
@@ -558,6 +572,12 @@ class PopupManager {
         try {
             if (loadingElement) loadingElement.classList.remove('hidden');
             if (feedbackElement) feedbackElement.classList.add('hidden');
+
+            // 增加使用次数计数
+            await LicenseManager.incrementUsage();
+
+            // 获取并更新所有显示剩余次数的元素
+            await this.updateAllUsageCounters();
             
             const recognizedTextElement = document.getElementById('recognized-text');
             if (recognizedTextElement) {
@@ -606,6 +626,25 @@ class PopupManager {
             if (loadingElement) loadingElement.classList.add('hidden');
             if (feedbackElement) feedbackElement.classList.remove('hidden');
             this.resetRecordingState();
+        }
+    }
+
+    // 添加更新所有使用次数显示的方法
+    async updateAllUsageCounters() {
+        try {
+            const { remainingCount } = await LicenseManager.checkUsageLimit();
+            const counters = [
+                document.getElementById('remaining-count'),
+                document.getElementById('practice-remaining-count')
+            ];
+            
+            counters.forEach(counter => {
+                if (counter) {
+                    counter.textContent = remainingCount >= 0 ? remainingCount.toString() : '∞';
+                }
+            });
+        } catch (error) {
+            Logger.error('Error updating usage counters:', error);
         }
     }
 
