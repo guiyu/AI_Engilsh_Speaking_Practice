@@ -370,5 +370,9 @@
   "freeUse": {
     "message": "免费使用",
     "description": "免费使用标签"
+  },
+  "advancedSpeechAnalysis": {
+    "message": "高级语音分析",
+    "description": "Pro version feature"
   }
 }

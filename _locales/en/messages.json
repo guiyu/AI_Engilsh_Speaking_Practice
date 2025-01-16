@@ -358,5 +358,21 @@
   "freeUse": {
     "message": "Free",
     "description": "Free Use"
+  },
+  "upgradeToPro": {
+    "message": "Upgrade to Pro",
+    "description": "Upgrade to pro button text"
+  },
+  "proVersionDesc": {
+    "message": "Upgrade to Pro for unlimited usage and voice synthesis",
+    "description": "Pro version description"
+  },
+  "basicGrammarAnalysis": {
+    "message": "Basic Grammar Analysis",
+    "description": "Free version feature - Basic grammar analysis"
+  },
+  "advancedAnalysis": {
+    "message": "Advanced Speech Analysis",
+    "description": "Pro version feature - Advanced analysis"
   }
 }
